@@ -15,6 +15,7 @@ from news.news import News
 from voucher.asiatimes import Global
 from voucher.googleApi import Google_Api
 from voucher.hans import ESG
+from voucher.news2day import NEWS2DAY
 
 app = Flask(__name__)
 CORS(app)
@@ -30,12 +31,14 @@ api = Api(
     license="MIT"
 )
 
-api.add_namespace(Todo, '/todo')
-api.add_namespace(Extractor, '/extractor')
-api.add_namespace(News, '/news')
-api.add_namespace(Global, '/global')
-api.add_namespace(Google_Api, '/google')
+# api.add_namespace(Todo, '/todo')
+# api.add_namespace(Extractor, '/extractor')
+# # api.add_namespace(News, '/news')
+# api.add_namespace(Global, '/global')
+# api.add_namespace(Google_Api, '/google')
 api.add_namespace(ESG, '/esg')
+api.add_namespace(NEWS2DAY, '/news2day')
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=10001)
+    # app.run(debug=False, host='0.0.0.0', port=10001) #실제 운영 API 
+    app.run(debug=True, port=5000) # 테스트 API
