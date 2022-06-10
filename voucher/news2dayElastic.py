@@ -1,37 +1,38 @@
 from flask import request
 from flask_restx import Resource, Namespace, fields
-from voucher.database.news2day.news2dayDB import News2dayDB
+from voucher.database.news2day.news2dayElastic import News2dayElastic
 from voucher.util import Util
 
-NEWS2DAY = Namespace(
+NEWS2DAY_ELASTIC = Namespace(
     name="NEWS2DAY",
-    description="뉴스투데이 API 입니다."
+    description="뉴스투데이 API 입니다. (Elasticsearch 적용)"
 )
 
-news2dayDB = News2dayDB()
+news2dayElastic = News2dayElastic()
 util = Util()
 
-res_model = NEWS2DAY.model('News2day Res', {
+res_model = NEWS2DAY_ELASTIC.model('News2day Res', {
     'success': fields.Boolean(description='API Success/Failure', required=True),
     'message': fields.String(description='Success/Failure message',required=True),
 })
 
-@NEWS2DAY.route('/selectNews')
+@NEWS2DAY_ELASTIC.route('/selectNewsElastic')
+# @NEWS2DAY_ELASTIC.route('/_search')
 class selectNews(Resource):
     
-        news2day_model = NEWS2DAY.model('NEWS2DAY_Model',{
+        news2day_model = NEWS2DAY_ELASTIC.model('NEWS2DAY_Model_Elastic',{
             'type': fields.String(example="G")
         })
         
-        @NEWS2DAY.expect(news2day_model)
+        @NEWS2DAY_ELASTIC.expect(news2day_model)
         
-        @NEWS2DAY.response(200, 'API Success/Failure', res_model)
-        @NEWS2DAY.response(400, 'Failure')
-        @NEWS2DAY.response(500, 'Error')
+        @NEWS2DAY_ELASTIC.response(200, 'API Success/Failure', res_model)
+        @NEWS2DAY_ELASTIC.response(400, 'Failure')
+        @NEWS2DAY_ELASTIC.response(500, 'Error')
         
         def post(self):
             """
-            뉴스투데이 API 입니다. (TEST 중 / RDBMS 적용)
+            뉴스투데이 API 입니다. (TEST 중 / Elasticsearch 적용)
             """
             result = None
         
@@ -43,6 +44,8 @@ class selectNews(Resource):
             if refineParams["success"] :
                 newParams = refineParams["params"]
                 print(newParams)
-                result = news2dayDB.SELECT(newParams) 
+                
+                index = "voucher_news"
+                result = news2dayElastic.search(index, newParams)
             
             return result
