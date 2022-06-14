@@ -6,14 +6,14 @@ from flask_cors import CORS, cross_origin
 from todo.todo import Todo 
 
 ### GPT API ###
-from extractor.extractor import Extractor
+# from extractor.extractor import Extractor
 
 ### NEWS API ###
-from news.news import News
+# from news.news import News
 
 ### VOUCHER API ###
-from voucher.asiatimes import Global
-from voucher.googleApi import Google_Api
+# from voucher.asiatimes import Global
+# from voucher.googleApi import Google_Api
 from voucher.hans import ESG
 from voucher.news2day import NEWS2DAY
 from voucher.news2dayElastic import NEWS2DAY_ELASTIC

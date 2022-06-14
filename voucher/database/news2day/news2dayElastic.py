@@ -1,4 +1,5 @@
 ######ONLY FOR LOCAL TEST##########
+import enum
 import sys
 from time import strptime
 
@@ -17,11 +18,12 @@ class News2dayElastic:
         self.type, self.query, self.sdate, self.edate = "", "", "", ""
         self.ecnt, self.scnt, self.gcnt = 0, 0, 0
         
-    def searchByEsg(self, index, body, ESG):
+    def searchByEsg(self, index, body, obj):
         result = {"success": True, "result": []}
         try:
             returnList, totalCnt, lastStatus = [], 0, None
-            for esg in list(ESG):
+            for esg in list(obj["esg"]):
+                esg = esg.upper()
                 ESG_List = []
                 
                 page = int(self.page) - 1
@@ -29,6 +31,11 @@ class News2dayElastic:
                 
                 start = page*display
                 end = display
+                
+                # 페이징 처리 
+                body['from'] = start
+                body['size'] = end
+                
                 lastNum = start+end
                 
                 if esg == "E": totalCnt = self.ecnt 
@@ -38,33 +45,18 @@ class News2dayElastic:
                 if lastNum >= totalCnt : lastStatus = True
                 else: lastStatus = False
                 
-                ######### DB SQL REFERENCE #########
-                # """    
-                # SELECT * FROM VOUCHER_NEWS2DAY_ WHERE 1=1
-                # AND (MATCH(Title, Article) AGAINST('삼성' IN BOOLEAN MODE))
-                # AND TYPE='N'
-                # AND Article_Time >= '2022-06-06 00:00:00'
-                # AND Article_Time <= '2022-06-08 23:59:59'
-                # AND Section_ESG LIKE '%'E'%'
-                # ORDER BY Article_Time DESC
-                # LIMIT {start}, {end} -- 페이징처리 
-                # """
-                ####################################
-                
                 # ESG 검색 조건 추가 
-                # 엘라 쿼리문 다솜대리님이랑 재확인 해야함
-                # 페이징 처리, 내림차순 DESC 처리 해야함  
                 condition = {"match": {"Section_ESG": esg}}
-                es_must_list = body['query']['bool']['must']
-                es_must_list.append(condition)
-                                
+                body_must_list = body['query']['bool']['must']
+                body_must_list.append(condition)
+                
                 es = loadElastic.es_conn() # 엘라스틱서치 연결
                 print("[{}] Elasticsearch Connected for searchByEsg [{}] \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), esg))
-                searchByEsg_body = body
-                res = es.search(index=index, body=searchByEsg_body)
-
+                res = es.search(index=index, body=body)
+                
                 for idx, row in enumerate(res['hits']['hits']):
                     row = row['_source']
+                    
                     ESG_List.append({
                         "press": str(row['PRESS']),
                         "title": str(row['Title']),
@@ -74,88 +66,82 @@ class News2dayElastic:
                     })
                 
                 ESG_Result = {"type": esg, "list": ESG_List}
-                returnList.append(ESG_Result)
+                returnList.append(ESG_Result) 
+                
+                # 앞서 추가된 조건 {"match": {"Section_ESG": esg}} 삭제 
+                if obj["emotion"] : # ESG 감성지수 파이차트 조각 클릭 
+                    del body_must_list[2:]
+    
+                else: 
+                    del body_must_list[1:2] 
                 
         except Exception as err:
             print("[{}] SearchByEsg Error: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
         
         finally:
             result["result"] = returnList
-            if ESG != "ESG" : result["lastStatus"] = lastStatus
+            if obj["esg"] != "ESG" : result["lastStatus"] = lastStatus
             return result
-
+            
     def searchCount(self, index, body):
         result = {"success": True, "total": []}
-        try:
-            pass
-            # condition = {
-            #                 "aggs": {
-            #                     "Section_ESG": {
-            #                     "terms": {
-            #                         "field": "E"
-            #                     }
-            #                     },
-            #                     "Section_ESG": {
-            #                     "terms": {
-            #                         "field": "S"
-            #                     }
-            #                     },
-            #                     "Section_ESG":{ 
-            #                     "terms": {
-            #                         "field": "G"
-            #                     }
-            #                     }
-            #                 }
-            #             }
-            # body.update(condition)
-            # # print(body)
+ 
+        try: 
+            condition = {"aggs": 
+                            {"Section_ESG": {
+                                    "terms": {"field": "Section_ESG.keyword"}}}
+                        }
+
+            body_must_list = body['query']['bool']['must']
+            del body_must_list[2:4] # searchByEsg 에서 추가했던 {"match": {"Section_ESG": esg}} 조건 삭제
+            body.update(condition) # searchCount 조건 추가 
+        
+            es = loadElastic.es_conn() # 엘라스틱서치 연결
+            print("[{}] Elasticsearch Connected for searchCount \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            res = es.search(index=index, body=body)
             
-            # es = loadElastic.es_conn() # 엘라스틱서치 연결
-            # print("[{}] Elasticsearch Connected for searchCount \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-            # searchCount_body = body
-            # res = es.search(index=index, body=searchCount_body)
-            # print(res)
+            e_cnt, s_cnt, g_cnt = 0, 0, 0
+            for idx, row in enumerate(res['aggregations']['Section_ESG']['buckets']):
+                if "E" in row['key']: e_cnt += row['doc_count']
+                if "S" in row['key']: s_cnt += row['doc_count']
+                if "G" in row['key']: g_cnt += row['doc_count']
+                
+            self.ecnt = e_cnt 
+            self.scnt = s_cnt
+            self.gcnt = g_cnt
             
-            # # searchCount_body = {'from': '0', 'size': '10', 'query': {'bool': {'must': [{'range': {'Article_Time': {'gte': '2022-06-07 00:00:00', 'lte': '2022-06-07 23:59:59'}}}], 
-            # #         'should': [{'term': {'Title': '제주'}}, {'term': {'Article': '제주'}}, {'match_phrase': {'Title.nori': '제주'}}, 
-            # #         {'match_phrase': {'Article.nori': '제주'}}], 'minimum_should_match': 1}}} 
-     
-            
-            ######### DB SQL REFERENCE #########
-            # """    
-            # SELECT Section_ESG, count(*) FROM VOUCHER_NEWS2DAY_ WHERE 1=1
-            # AND (MATCH(Title, Article) AGAINST('삼성' IN BOOLEAN MODE))
-            # AND TYPE='N'
-            # AND Article_Time >= '2022-06-06 00:00:00'
-            # AND Article_Time <= '2022-06-08 23:59:59'
-            # GROUP BY Section_ESG
-            # """
-            ####################################
+            result["total"].append({"e_cnt" : e_cnt})
+            result["total"].append({"s_cnt" : s_cnt})
+            result["total"].append({"g_cnt" : g_cnt})
             
         except Exception as err:
-            print("[{}] SearchByEsg Error: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
+            print("[{}] SearchCount Error: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
             result = {"success": False, "message": str(err)}
             
         finally:
             return result 
-    
+            
     def searchSenti(self, index, body):
         result = {"success": True, "senti": []}
         try:
-            pass
-            ######### DB SQL REFERENCE #########
-            # """    
-            # SELECT AI_Emotion, count(*) FROM VOUCHER_NEWS2DAY_ WHERE 1=1
-            # AND (MATCH(Title, Article) AGAINST('삼성' IN BOOLEAN MODE))
-            # AND TYPE='N'
-            # AND Article_Time >= '2022-06-06 00:00:00'
-            # AND Article_Time <= '2022-06-08 23:59:59'
-            # GROUP BY AI_Emotion
-            # """
-            ####################################
+            condition = {"aggs": 
+                            {"AI_Emotion": {
+                                    "terms": {"field": "AI_Emotion"}}}
+                        }
+            
+            del body['aggs'] # searchByEsg 에서 추가했던 조건 삭제 
+            body.update(condition) # searchSenti 조건 추가 
+            
+            es = loadElastic.es_conn() # 엘라스틱서치 연결
+            print("[{}] Elasticsearch Connected for searchSenti \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            res = es.search(index=index, body=body)
+            
+            for idx, row in enumerate(res['aggregations']['AI_Emotion']['buckets']):
+                result["senti"].append({
+                    "level": row['key'], "cnt": row['doc_count']})
             
         except Exception as err:
-            print("[{}] SearchByEsg Error: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
+            print("[{}] SearchSenti Error: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
             result = {"success": False, "message": str(err)}
             
         finally:
@@ -163,55 +149,66 @@ class News2dayElastic:
     
     def search(self, index, obj):
         result = None
-        
-        es = loadElastic.es_conn() # 엘라스틱서치 연결
-        print("[{}] Elasticsearch Connected for search \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        
-        newQuery = ""
-        condition = obj["condition"]
-        if condition == "OR":
-            for idx, query in enumerate(obj["query"]):
-                newQuery += query + (" " if idx != len(obj["query"])-1 else "")
-        else :
-            for idx, query in enumerate(obj["query"]):
-                newQuery += '"'+query+'"' + ("+" if idx != len(obj['query'])-1 else "")
+        try:
+            es = loadElastic.es_conn() # 엘라스틱서치 연결
+            print("[{}] Elasticsearch Connected for search \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            
+            newQuery = ""
+            condition = obj["condition"]
+            if condition == "OR":
+                for idx, query in enumerate(obj["query"]):
+                    newQuery += query + (" " if idx != len(obj["query"])-1 else "")
+            else :
+                for idx, query in enumerate(obj["query"]):
+                    newQuery += '"'+query+'"' + ("+" if idx != len(obj['query'])-1 else "")
+                        
+            self.query = newQuery
+            self.type = obj["type"]
+            self.sdate = obj["sdate"] + " 00:00:00"
+            self.edate = obj["edate"] + " 23:59:59"
+            self.page = obj["page"]
+            self.display = obj["display"]
+            self.emotion = obj["emotion"]
+            
+            body =  {   
+                            "from": self.page,
+                            "size": self.display,
+                            "sort": {"Article_Time": "desc"},
+                            "query": {
+                                    "bool": {
+                                        "must": [{"range": {"Article_Time": {"gte": self.sdate, "lte": self.edate}}}, {"match": {"AI_Emotion": self.emotion}}],
+                                        "should": [{"term": {"Title": self.query}}, {"term": {"Article": self.query}},
+                                                    {"match_phrase": {"Title.nori": self.query}}, {"match_phrase": {"Article.nori": self.query}}],
+                                        "minimum_should_match": 1
+                                            }
+                                    }
+                        } 
+            
+            # res = es.search(index=index, body=body)
+
+            if self.emotion == "": 
+                body_must_list = body['query']['bool']['must']
+                del body_must_list[1]
+            
+            result = self.searchByEsg(index, body, obj)
+            display_type = list(obj["esg"])
+            
+            if len(display_type) != 1:
+                cntList = self.searchCount(index, body)
+                if cntList["success"]:
+                    result["total"] = cntList["total"]
+                
+                sentiList = self.searchSenti(index, body)
+                if sentiList["success"]:
+                    result["senti"] = sentiList["senti"]
                     
-        self.query = newQuery
-        self.type = obj["type"]
-        self.sdate = obj["sdate"] + " 00:00:00"
-        self.edate = obj["edate"] + " 23:59:59"
-        self.page = obj["page"]
-        self.display = obj["display"]
-        self.emotion = obj["emotion"]
+        except Exception as err:
+            print("[{}] ELASTICSEARCH ERROR: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
+            result = {"success": False, "message": str(err)}  
         
-        es_body =  {   
-                        "from": self.page,
-                        "size": self.display,
-                        "query": {
-                                "bool": {
-                                    "must": [{"range": {"Article_Time": {"gte": self.sdate, "lte": self.edate}}}],
-                                    "should": [{"term": {"Title": self.query}}, {"term": {"Article": self.query}},
-                                                {"match_phrase": {"Title.nori": self.query}}, {"match_phrase": {"Article.nori": self.query}}],
-                                    "minimum_should_match": 1
-                                        }
-                                }
-                    } 
-        
-        res = es.search(index=index, body=es_body)
-        
-        result = self.searchByEsg(index, es_body, obj["esg"])
-        display_type = list(obj["esg"])
-        
-        if len(display_type) != 1:
-            cntList = self.searchCount(index, es_body)
-            if cntList["success"]:
-                result["total"] = cntList["total"]
-            
-            sentiList = self.searchSenti(index, es_body)
-            if sentiList["success"]:
-                result["senti"] = sentiList["senti"]
-            
-        return result
+        finally:
+            es.close()
+            return result
 
 if __name__ == "__main__":    
     news2dayElastic = News2dayElastic()
@@ -226,5 +223,5 @@ if __name__ == "__main__":
             "condition":"OR"}
     index = "voucher_news" # 검색할 인덱스명 - 변경 가능 
     result = news2dayElastic.search(index, obj)
-    print("===========result==========")
-    print(result)
+    # print("===========result==========")
+    # print(result)
