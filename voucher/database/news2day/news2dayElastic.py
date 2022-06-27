@@ -54,6 +54,9 @@ class News2dayElastic:
                 print("[{}] Elasticsearch Connected for searchByEsg [{}] \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), esg))
                 res = es.search(index=index, body=body)
                 
+                # print("========1. searchByEsg Body============")
+                # print(body)
+                
                 for idx, row in enumerate(res['hits']['hits']):
                     row = row['_source']
                     
@@ -70,10 +73,12 @@ class News2dayElastic:
                 
                 # 앞서 추가된 조건 {"match": {"Section_ESG": esg}} 삭제 
                 if obj["emotion"] : # ESG 감성지수 파이차트 조각 클릭 
-                    del body_must_list[2:]
+                    # del body_must_list[2:]
+                    del body_must_list[3:] # ES 검색 조건에 TYPE='G' or 'N' 추가하면서 코드 변경 
     
                 else: 
-                    del body_must_list[1:2] 
+                    # del body_must_list[1:2] 
+                    del body_must_list[2:3] # ES 검색 조건에 TYPE='G' or 'N' 추가하면서 코드 변경 
                 
         except Exception as err:
             print("[{}] SearchByEsg Error: \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), err)
@@ -93,8 +98,11 @@ class News2dayElastic:
                         }
 
             body_must_list = body['query']['bool']['must']
-            del body_must_list[2:4] # searchByEsg 에서 추가했던 {"match": {"Section_ESG": esg}} 조건 삭제
+            # del body_must_list[2:4] # searchByEsg 에서 추가했던 {"match": {"Section_ESG": esg}} 조건 삭제 -> 다시 확인해보니 불필요하여 주석처리 
             body.update(condition) # searchCount 조건 추가 
+            
+            # print("=============2. searchCount Body==============")
+            # print(body)
         
             es = loadElastic.es_conn() # 엘라스틱서치 연결
             print("[{}] Elasticsearch Connected for searchCount \n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
@@ -126,7 +134,7 @@ class News2dayElastic:
         try:
             condition = {"aggs": 
                             {"AI_Emotion": {
-                                    "terms": {"field": "AI_Emotion"}}}
+                                    "terms": {"field": "AI_Emotion.keyword"}}}
                         }
             
             del body['aggs'] # searchByEsg 에서 추가했던 조건 삭제 
@@ -173,10 +181,10 @@ class News2dayElastic:
             body =  {   
                             "from": self.page,
                             "size": self.display,
-                            "sort": {"Article_Time": "desc"},
+                            "sort": [{"Article_Time": {"order": "desc"}}],
                             "query": {
                                     "bool": {
-                                        "must": [{"range": {"Article_Time": {"gte": self.sdate, "lte": self.edate}}}, {"match": {"AI_Emotion": self.emotion}}],
+                                        "must": [{"range": {"Article_Time": {"gte": self.sdate, "lte": self.edate}}}, {"match_phrase": {"TYPE.keyword": self.type}}, {"match": {"AI_Emotion": self.emotion}}],
                                         "should": [{"term": {"Title": self.query}}, {"term": {"Article": self.query}},
                                                     {"match_phrase": {"Title.nori": self.query}}, {"match_phrase": {"Article.nori": self.query}}],
                                         "minimum_should_match": 1
@@ -188,7 +196,8 @@ class News2dayElastic:
 
             if self.emotion == "": 
                 body_must_list = body['query']['bool']['must']
-                del body_must_list[1]
+                # del body_must_list[1]
+                del body_must_list[2] # ES 검색 조건에 TYPE='G' or 'N' 추가하면서 코드 변경 
             
             result = self.searchByEsg(index, body, obj)
             display_type = list(obj["esg"])
@@ -221,7 +230,7 @@ if __name__ == "__main__":
             "sdate":"2022-06-07",
             "edate":"2022-06-07",
             "condition":"OR"}
-    index = "voucher_news" # 검색할 인덱스명 - 변경 가능 
+    index = "voucher_news_test" # 검색할 인덱스명 - 변경 가능 
     result = news2dayElastic.search(index, obj)
     # print("===========result==========")
     # print(result)

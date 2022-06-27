@@ -32,7 +32,40 @@ class selectNews(Resource):
         
         def post(self):
             """
-            뉴스투데이 API 입니다. (TEST 중 / Elasticsearch 적용)
+            뉴스투데이 API 입니다. (Elasticsearch 적용)
+
+            ### page/display값은 ESG 통합검색에서는 사용되지 않습니다. (값 무시)
+            ### ESG전체검색에서 ESG별로 TOTAL COUNT가 리턴됩니다.
+            ###
+
+            **query** : 검색어 (required)
+            **esg** : 분류값 (ESG / "E,S,G" / required)
+            **condition** : 조건 (""/"AND"/"OR")
+            **sdate** : 시작날짜 (yyyy-mm-dd / required)
+            **edate** : 종료날짜 (yyyy-mm-dd / required)
+
+            **page** : 페이지 (default 1 / required)
+            **display** : 한페이지내에 보여줄 기사 갯수 (default 10 / required)
+            **emotion** : 감성 점수 입니다 1~5 (default "" / required)
+
+            # Output Arguments
+            ``` json
+            {
+                "result": [
+                    {
+                        "type": "",
+                        "list": [
+                            {
+                                "article": "",
+                                "title": "",
+                                "url": ""
+                            }
+                        ]
+                    }
+                ],
+                "success": true
+            }
+            ```
             """
             result = None
         
@@ -45,7 +78,7 @@ class selectNews(Resource):
                 newParams = refineParams["params"]
                 print(newParams)
                 
-                index = "voucher_news"
+                index = "voucher_news_test"
                 result = news2dayElastic.search(index, newParams)
             
             return result
