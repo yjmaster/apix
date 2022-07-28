@@ -78,7 +78,7 @@ class selectNews(Resource):
                 newParams = refineParams["params"]
                 print(newParams)
                 
-                index = "voucher_news_test"
+                index = "voucher_news"
                 result = news2dayElastic.search(index, newParams)
             
             return result

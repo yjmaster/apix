@@ -1,5 +1,4 @@
 from elasticsearch import Elasticsearch
-# http://192.168.0.190:9200/voucher_news/_search
 
 class LoadElastic:
 	def __init__(self, host='http://192.168.0.190:9200/',

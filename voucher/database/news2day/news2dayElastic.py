@@ -172,8 +172,8 @@ class News2dayElastic:
                         
             self.query = newQuery
             self.type = obj["type"]
-            self.sdate = obj["sdate"] + " 00:00:00"
-            self.edate = obj["edate"] + " 23:59:59"
+            self.sdate = obj["sdate"] + "T00:00:00"
+            self.edate = obj["edate"] + "T23:59:59"
             self.page = obj["page"]
             self.display = obj["display"]
             self.emotion = obj["emotion"]
