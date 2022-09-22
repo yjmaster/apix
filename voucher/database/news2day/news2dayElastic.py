@@ -230,7 +230,7 @@ if __name__ == "__main__":
             "sdate":"2022-06-07",
             "edate":"2022-06-07",
             "condition":"OR"}
-    index = "voucher_news_test" # 검색할 인덱스명 - 변경 가능 
+    index = "voucher_news" # 검색할 인덱스명 - 변경 가능 
     result = news2dayElastic.search(index, obj)
     # print("===========result==========")
     # print(result)
