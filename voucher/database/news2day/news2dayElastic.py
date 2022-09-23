@@ -4,7 +4,7 @@ import sys
 from time import strptime
 
 from soupsieve import escape
-sys.path.append("d:\\apix\\")
+# sys.path.append("d:\\apix\\")
 ###################################
 
 from voucher.database.LoadElastic import LoadElastic
