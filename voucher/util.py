@@ -1,6 +1,5 @@
 from voucher.database.LoadDB import LoadDB
 loadDb = LoadDB()
-
 class Util():
     def duplicationCheck(self, params, tableName, colName):
         result = None

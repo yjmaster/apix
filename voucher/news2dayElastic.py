@@ -2,6 +2,7 @@ from flask import request
 from flask_restx import Resource, Namespace, fields
 from voucher.database.news2day.news2dayElastic import News2dayElastic
 from voucher.util import Util
+from extractor.db.aiLog import aiLog
 
 NEWS2DAY_ELASTIC = Namespace(
     name="NEWS2DAY",
@@ -10,16 +11,17 @@ NEWS2DAY_ELASTIC = Namespace(
 
 news2dayElastic = News2dayElastic()
 util = Util()
+log = aiLog()
 
+# response model
 res_model = NEWS2DAY_ELASTIC.model('News2day Res', {
     'success': fields.Boolean(description='API Success/Failure', required=True),
     'message': fields.String(description='Success/Failure message',required=True),
 })
 
-@NEWS2DAY_ELASTIC.route('/selectNewsElastic')
-# @NEWS2DAY_ELASTIC.route('/_search')
+@NEWS2DAY_ELASTIC.route('/selectNews')
 class selectNews(Resource):
-    
+
         news2day_model = NEWS2DAY_ELASTIC.model('NEWS2DAY_Model_Elastic',{
             'type': fields.String(example="G")
         })
@@ -45,7 +47,7 @@ class selectNews(Resource):
             **edate** : 종료날짜 (yyyy-mm-dd / required)
 
             **page** : 페이지 (default 1 / required)
-            **display** : 한페이지내에 보여줄 기사 갯수 (default 10 / required)
+            **display** : 한 페이지 내에 보여줄 기사 갯수 (default 10 / required)
             **emotion** : 감성 점수 입니다 1~5 (default "" / required)
 
             # Output Arguments
@@ -63,22 +65,35 @@ class selectNews(Resource):
                         ]
                     }
                 ],
-                "success": true
+                "success": True
             }
             ```
             """
-            result = None
         
             # result = news2dayDB.SELECT(params)
             params = request.get_json()
             required = {'type': True, 'esg': True, 'display': 10, 'page': 1, 'emotion': "", 'query': True, 'sdate': True, 'edate': True, 'condition': ""}
             refineParams = util.validationCheck(params, required)
             
-            if refineParams["success"] :
-                newParams = refineParams["params"]
-                print(newParams)
+            result = None
+            try:
+                if refineParams["success"] :
+                    newParams = refineParams["params"]
+                    print(newParams)
+                    
+                    index = "voucher_news"
+                    result = news2dayElastic.search(index, newParams)
+                    write_log(request) # 검색 사용 로그를 남긴다
+                    
+                    return result
                 
-                index = "voucher_news"
-                result = news2dayElastic.search(index, newParams)
-            
-            return result
+            except Exception as exp:
+                result = {"success" : False, "message": str(exp)}
+                
+            finally:
+                return result        
+
+def write_log(request):
+    router = (request.url_rule.rule).split("/")[-1]
+    log.DB_CONNECT()
+    log.DB_UPDATE("news2day", router)

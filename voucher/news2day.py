@@ -5,7 +5,7 @@ from voucher.util import Util
 
 NEWS2DAY = Namespace(
     name="NEWS2DAY",
-    description="뉴스투데이 API 입니다."
+    description="뉴스투데이 API 입니다. (TEST를 위한 RDBMS 적용. 실제 사용 X)"
 )
 
 news2dayDB = News2dayDB()
@@ -31,7 +31,7 @@ class selectNews(Resource):
         
         def post(self):
             """
-            뉴스투데이 API 입니다. (TEST 중 / RDBMS 적용)
+            뉴스투데이 API 입니다. (TEST를 위한 RDBMS 적용. 실제 사용 X)
             """
             result = None
         

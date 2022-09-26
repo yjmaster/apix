@@ -42,7 +42,6 @@ api.add_namespace(Google_Api, '/google')
 api.add_namespace(NEWS2DAY_ELASTIC, '/esg')
 # api.add_namespace(ESG, '/esg')
 # api.add_namespace(NEWS2DAY, '/news2day')
-# api.add_namespace(NEWS2DAY_ELASTIC, '/news2day')
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=10001) #실제 운영 API 
