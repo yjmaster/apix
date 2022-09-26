@@ -72,6 +72,11 @@ class selectNews(Resource):
         
             # result = news2dayDB.SELECT(params)
             params = request.get_json()
+            
+            # 220926 한스ESG 에서도 이 API 를 사용함. 한스ESG에서 검색 시 포털 선택을 하지 않기 때문에 type 값으로 N을 설정해준다. 
+            if not params.get("type") : 
+                params['type'] = "N"
+
             required = {'type': True, 'esg': True, 'display': 10, 'page': 1, 'emotion': "", 'query': True, 'sdate': True, 'edate': True, 'condition': ""}
             refineParams = util.validationCheck(params, required)
             
