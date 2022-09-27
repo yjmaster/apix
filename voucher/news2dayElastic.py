@@ -6,27 +6,36 @@ from extractor.db.aiLog import aiLog
 
 NEWS2DAY_ELASTIC = Namespace(
     name="NEWS2DAY",
-    description="뉴스투데이 API 입니다. (Elasticsearch 적용)"
+    description="한스/뉴스투데이 공통 AI ESG API. (Elasticsearch 사용)"
 )
 
 news2dayElastic = News2dayElastic()
 util = Util()
 log = aiLog()
 
+# request model
+req_model = NEWS2DAY_ELASTIC.model('NEWS2DAY_Model',{
+            'type': fields.String(example="N"),
+            'esg' : fields.String(example="ESG"),
+            'display' : fields.String(example="10"),
+            'page' : fields.String(example="1"),
+            'emotion' : fields.String(example=""),
+            'query' : fields.String(example="양재"),
+            'sdate': fields.String(example="2022-09-26"),
+            'edate': fields.String(example="2022-09-27"),
+            'condition': fields.String(example="OR")
+        })
+
 # response model
 res_model = NEWS2DAY_ELASTIC.model('News2day Res', {
     'success': fields.Boolean(description='API Success/Failure', required=True),
-    'message': fields.String(description='Success/Failure message',required=True),
+    'result': fields.String(description='Success/Failure message',required=True),
 })
 
 @NEWS2DAY_ELASTIC.route('/selectNews')
 class selectNews(Resource):
-
-        news2day_model = NEWS2DAY_ELASTIC.model('NEWS2DAY_Model_Elastic',{
-            'type': fields.String(example="G")
-        })
         
-        @NEWS2DAY_ELASTIC.expect(news2day_model)
+        @NEWS2DAY_ELASTIC.doc(parser=req_model)
         
         @NEWS2DAY_ELASTIC.response(200, 'API Success/Failure', res_model)
         @NEWS2DAY_ELASTIC.response(400, 'Failure')
@@ -34,12 +43,13 @@ class selectNews(Resource):
         
         def post(self):
             """
-            뉴스투데이 API 입니다. (Elasticsearch 적용)
+            한스/뉴스투데이 공통 AI ESG API 입니다.
 
-            ### page/display값은 ESG 통합검색에서는 사용되지 않습니다. (값 무시)
-            ### ESG전체검색에서 ESG별로 TOTAL COUNT가 리턴됩니다.
-            ###
+            ### page/display 값은 ESG 통합검색에서는 사용되지 않습니다. (값 무시)
+            ### ESG: ESG별로 TOTAL COUNT가 리턴됩니다.
+            ### EMOTION: 감성 점수별로 TOTAL COUNT가 리턴됩니다.
 
+            **type** : 포털 타입 (네이버:N, 구글:G / required) - 한스 ESG의 경우 포털을 선택하지 않기 때문에 API에서 자체적으로 포털 타입을 "N"으로 설정합니다.  
             **query** : 검색어 (required)
             **esg** : 분류값 (ESG / "E,S,G" / required)
             **condition** : 조건 (""/"AND"/"OR")
@@ -50,23 +60,82 @@ class selectNews(Resource):
             **display** : 한 페이지 내에 보여줄 기사 갯수 (default 10 / required)
             **emotion** : 감성 점수 입니다 1~5 (default "" / required)
 
-            # Output Arguments
+            # Output Arguments (Example)
             ``` json
             {
+                "success": true,
                 "result": [
                     {
-                        "type": "",
-                        "list": [
-                            {
-                                "article": "",
-                                "title": "",
-                                "url": ""
-                            }
-                        ]
+                    "type": "E",
+                    "list": [
+                        {
+                        "press": "언론사",
+                        "title": "기사제목",
+                        "url": "기사 url",
+                        "emotion": "감성 점수",
+                        "img": "기사 썸네일 이미지 url"
+                        }
+                    ]
+                    },
+                    {
+                    "type": "S",
+                    "list": [
+                        {
+                        "press": "언론사",
+                        "title": "기사제목",
+                        "url": "기사 url",
+                        "emotion": "감성 점수",
+                        "img": "기사 썸네일 이미지 url"
+                        }
+                    ]
+                    },
+                    {
+                    "type": "G",
+                    "list": [
+                        {
+                        "press": "언론사",
+                        "title": "기사제목",
+                        "url": "기사 url",
+                        "emotion": "감성 점수",
+                        "img": "기사 썸네일 이미지 url"
+                        }
+                    ]
                     }
                 ],
-                "success": True
-            }
+                "total": [
+                    {
+                    "e_cnt": 32
+                    },
+                    {
+                    "s_cnt": 301
+                    },
+                    {
+                    "g_cnt": 53
+                    }
+                ],
+                "senti": [
+                    {
+                    "level": "5",
+                    "cnt": 103
+                    },
+                    {
+                    "level": "3",
+                    "cnt": 80
+                    },
+                    {
+                    "level": "4",
+                    "cnt": 75
+                    },
+                    {
+                    "level": "1",
+                    "cnt": 67
+                    },
+                    {
+                    "level": "2",
+                    "cnt": 54
+                    }
+                ]
+                }
             ```
             """
         
