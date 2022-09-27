@@ -223,7 +223,7 @@ class textrank(Resource):
 
             c = args['contents']
             textrank = TextRank()
-            gpt = textrank.summerizer(c)
+            gpt = textrank.summerizer(c, 3)
             r = {"success": True, "extractor": gpt}
 
         except Exception as exp:

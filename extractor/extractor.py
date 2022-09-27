@@ -745,7 +745,7 @@ class textrank(Resource):
 
             c = args['contents']
             textrank = TextRank()
-            gpt = textrank.summerizer(c)
+            gpt = textrank.summerizer(c, 5)
             print(gpt)
 
             r = {"extractor":  gpt}
