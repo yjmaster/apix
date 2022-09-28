@@ -1,17 +1,21 @@
+import json
+
 from flask import request, make_response
 from flask_restx import Resource, Namespace, fields
 
-import json
-from extractor.db.aiLog import aiLog
+# custom modules
+from utils.aiLog import aiLog
+from utils.reqFormat import reqFormat
 
+log = aiLog()
+
+# ai modules
 from yj_kogpt2_API.inference2 import kogpt2_inference_API
 from yj_kogpt2_sentiment_analyzer.sentiment_inference2 import kogpt2_inference_sentiment
 from textrank_master.summary import TextRank 
 
 KoGPT2_inferer_API = kogpt2_inference_API()
 Senti_inferer_API = kogpt2_inference_sentiment()
-
-log = aiLog()
 
 CBS = Namespace(
     name="CBS",
@@ -75,8 +79,8 @@ class GPT_keyword(Resource):
         """
         r = None
         try:
-            wirte_log(request)
-            args = parse_req_data(request)
+            log.wirte_log('cbs', request)
+            args = reqFormat.parse_data(request)
             if len(args['title']) == 0 and len(args['contents']) == 0:
                 r = {"success": False, "message": "NO INPUT"}
                 return make_response(r)
@@ -120,8 +124,8 @@ class GPT_section(Resource):
         """
         r = None
         try:
-            wirte_log(request)
-            args = parse_req_data(request)
+            log.wirte_log('cbs', request)
+            args = reqFormat.parse_data(request)
             if len(args['title']) == 0 and len(args['contents']) == 0:
                 r = {"success": False, "message": "NO INPUT"}
                 return make_response(r)
@@ -166,8 +170,8 @@ class GPT_sentiment(Resource):
         """
         r = None
         try:
-            wirte_log(request)
-            args = parse_req_data(request)
+            log.wirte_log('cbs', request)
+            args = reqFormat.parse_data(request)
             title = ""
             if "title" in args:
                 title = args['title']
@@ -214,8 +218,8 @@ class textrank(Resource):
 
         r = None
         try:
-            wirte_log(request)
-            args = parse_req_data(request)
+            log.wirte_log('cbs', request)
+            args = reqFormat.parse_data(request)
 
             if len(args['contents']) == 0:
                 r = {"success": False, "message": "NO INPUT"}
@@ -232,27 +236,3 @@ class textrank(Resource):
             return make_response(r)
 ################################################################################
 
-################################################################################
-def wirte_log(request):
-    router = (request.url_rule.rule).split("/")[-1]
-    log.DB_CONNECT()
-    log.DB_UPDATE("cbs", router)
-
-def parse_req_data(request):
-    """
-    flask의 request에서 데이터를 가져옴
-        주의: flask-restplus 모듈을 이용하여 swagger ui를 이용하는 패러미터
-            패싱이 제대로 안되어 본 함수 이용 (0.10.1)
-    :param request: Flask의 request
-    :return: parameter dict
-    """
-    if not hasattr(request, 'method'):
-        return None
-    if request.method.upper() != 'GET':
-        if request.data:
-            return json.loads(request.data.decode('utf-8'), strict=False)
-    if 'json' in request.args:
-        return json.loads(request.args['json'])
-    if request.args:
-        return request.args     # note: type is ImmutableMultiDict
-    return {}
