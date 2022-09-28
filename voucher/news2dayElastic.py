@@ -2,10 +2,10 @@ from flask import request
 from flask_restx import Resource, Namespace, fields
 from voucher.database.news2day.news2dayElastic import News2dayElastic
 from voucher.util import Util
-from extractor.db.aiLog import aiLog
+from utils.aiLog import aiLog
 
 NEWS2DAY_ELASTIC = Namespace(
-    name="NEWS2DAY",
+    name="ESG",
     description="한스/뉴스투데이 공통 AI ESG API. (Elasticsearch 사용)"
 )
 
@@ -142,9 +142,12 @@ class selectNews(Resource):
             # result = news2dayDB.SELECT(params)
             params = request.get_json()
             
+            media = None
             # 220926 한스ESG 에서도 이 API 를 사용함. 한스ESG에서 검색 시 포털 선택을 하지 않기 때문에 type 값으로 N을 설정해준다. 
             if not params.get("type") : 
                 params['type'] = "N"
+                media = "hans"
+            else : media = "news2day"
 
             required = {'type': True, 'esg': True, 'display': 10, 'page': 1, 'emotion': "", 'query': True, 'sdate': True, 'edate': True, 'condition': ""}
             refineParams = util.validationCheck(params, required)
@@ -153,11 +156,11 @@ class selectNews(Resource):
             try:
                 if refineParams["success"] :
                     newParams = refineParams["params"]
-                    print(newParams)
+                    #print(newParams)
                     
                     index = "voucher_news"
                     result = news2dayElastic.search(index, newParams)
-                    write_log(request) # 검색 사용 로그를 남긴다
+                    log.wirte_log(media, request) # 검색 사용 로그를 남긴다
                     
                     return result
                 
@@ -166,8 +169,3 @@ class selectNews(Resource):
                 
             finally:
                 return result        
-
-def write_log(request):
-    router = (request.url_rule.rule).split("/")[-1]
-    log.DB_CONNECT()
-    log.DB_UPDATE("news2day", router)
