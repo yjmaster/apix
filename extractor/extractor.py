@@ -1,10 +1,15 @@
+import json
+import requests
+from pprint import pprint
+
 from flask import request, make_response
 from flask_restx import Resource, Api, Namespace, fields
 
-import json
-from pprint import pprint
-import requests
-from extractor.cnf.LogDB import LogDB 
+# custom modules
+from utils.aiLog import aiLog
+from utils.reqFormat import reqFormat
+
+log = aiLog()
 
 from konke.model.unsupervised.statistical.tfidf import TfIdf
 
@@ -30,7 +35,8 @@ ASIA_TIMES_ENG_SENTI = eng_senti()
 import re
 from textrank_master.summary import TextRank 
 
-log = LogDB()
+
+
 
 Extractor = Namespace(
     name="Extractors",
@@ -119,8 +125,8 @@ class TF_IDF(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
             t = args['title']
             c = args['contents']
@@ -195,8 +201,8 @@ class NEWTF_IDF(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
             t = args['title']
             c = args['contents']
@@ -255,9 +261,13 @@ class GPT_title(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
-            pprint(args)
+            log.wirte_log('yjmedia', request)
+
+            args = reqFormat.parse_data(request)
+            pprint("======================================")
+            pprint(args )
+            pprint("======================================")
+
             
             if len(args['contents']) == 0:
                 r = {"success": False, "message": "NO INPUT"}
@@ -316,8 +326,8 @@ class AT_SENTI(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
             
             if len(args['contents']) == 0:
@@ -387,8 +397,8 @@ class GPT_summarizer(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['title']) == 0 and len(args['contents']) == 0:
@@ -458,8 +468,8 @@ class GPT_keyword(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['title']) == 0 and len(args['contents']) == 0:
@@ -527,8 +537,8 @@ class GPT_section(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['title']) == 0 and len(args['contents']) == 0:
@@ -593,8 +603,8 @@ class GPT_esg(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
             
             if len(args['contents']) == 0:
@@ -664,8 +674,8 @@ class bert(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['title']) == 0 and len(args['contents']) == 0:
@@ -735,8 +745,8 @@ class textrank(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['contents']) == 0:
@@ -787,8 +797,8 @@ class img_url(Resource):
 
         r = None
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             response = google_images_url.googleimagesdownload()  
             arguments = {"keywords":args["name"],"limit":9}
             images = response.download(arguments)
@@ -836,8 +846,8 @@ class person_info(Resource):
        #r = {"name": "NO MATCH WAS FOUND"}
 
        try:
-           logSave((request.url_rule.rule).split("/")[-1])
-           args = parse_req_data(request)
+           log.wirte_log('yjmedia', request)
+           args = reqFormat.parse_data(request)
            print(args)
            c = args['name']
            #c = args['extractor']
@@ -899,8 +909,8 @@ class GPT_sentiment(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['title']) == 0 and len(args['contents']) == 0:
@@ -969,8 +979,8 @@ class BART_Summary(Resource):
         r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
-            args = parse_req_data(request)
+            log.wirte_log('yjmedia', request)
+            args = reqFormat.parse_data(request)
             pprint(args)
 
             if len(args['title']) == 0 and len(args['contents']) == 0:
@@ -1014,7 +1024,7 @@ class NAVER_DICT(Resource):
 
         r = None
         try:
-            logSave((request.url_rule.rule).split("/")[-1])
+            log.wirte_log('yjmedia', request)
             display = 3
             names = request.json['name']
             displayChk = "display" in request.json
@@ -1076,28 +1086,3 @@ class globalkey(Resource):
 
 
 ################################################################################
-
-################################################################################
-def parse_req_data(request):
-    """
-    flask의 request에서 데이터를 가져옴
-        주의: flask-restplus 모듈을 이용하여 swagger ui를 이용하는 패러미터
-            패싱이 제대로 안되어 본 함수 이용 (0.10.1)
-    :param request: Flask의 request
-    :return: parameter dict
-    """
-    if not hasattr(request, 'method'):
-        return None
-    if request.method.upper() != 'GET':
-        if request.data:
-            return json.loads(request.data.decode('utf-8'), strict=False)
-    if 'json' in request.args:
-        return json.loads(request.args['json'])
-    if request.args:
-        return request.args     # note: type is ImmutableMultiDict
-    return {}
-
-def logSave(router):
-    log.DB_CONNECT()
-    log.DB_INSERT(router)
-    log.DB_CLOSE()

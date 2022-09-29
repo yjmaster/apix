@@ -1,5 +1,6 @@
 import pymysql
 from datetime import datetime
+from utils.reqFormat import reqFormat
 
 class aiLog:
 	def __init__(self, host='192.168.0.190', user='maria', password='maria123', db='maria_DB'):
@@ -16,20 +17,30 @@ class aiLog:
 		self.conn.query("set character_set_results=utf8;")
 		self.conn.query("set character_set_database=utf8;")
 
-	def DB_UPDATE(self, media, router):
+	def DB_UPDATE(self, media, router, userInfo):
 		try:
-			now = datetime.now()
-		
-			_SQL = """UPDATE news_ai_log_ AS a,
-				(SELECT cnt FROM news_ai_log_ WHERE router = '{router}') AS b
-				SET last_date = '{last_date}', a.cnt = (b.cnt)+1
-				WHERE 1=1
-				AND router = '{router}'
-				AND media = '{media}'""".format(
-					router = router,
-					last_date = now,
-					media = media
-				)
+			# userInfo 는 필수값이 될 예정
+			if bool(userInfo) == False :
+				userInfo['user_login'] = media
+				userInfo['user_name'] = media
+    
+			_SQL = """INSERT INTO news_ai_log SET
+					router = '{router}',
+					media = '{media}',
+					user_login = '{user_login}',
+					`user_name` = '{user_name}',
+					last_date = NOW(),
+					cnt = 1
+				ON DUPLICATE KEY UPDATE
+					cnt = cnt + 1,
+					last_date = NOW(),
+					user_login = '{user_login}',
+					`user_name` = '{user_name}'""".format(
+						router = router,
+						media = media,
+						user_login = userInfo['user_login'],
+						user_name = userInfo['user_name']
+					)
 
 			#print(_SQL)
 
@@ -44,7 +55,13 @@ class aiLog:
 			self.conn.close()
 			curs.close()
 
-	def wirte_log(self, media, request):
+	def wirte_log(self, media, request):	
+		userInfo = {}
 		router = (request.url_rule.rule).split("/")[-1]
+		args = reqFormat.parse_data(request)
+		if ('userLogin' in args) and ('userName' in args):
+			userInfo['userLogin'] = args['userLogin']
+			userInfo['userName'] = args['userName']
+
 		self.DB_CONNECT()
-		self.DB_UPDATE(media, router)
+		self.DB_UPDATE(media, router, userInfo)

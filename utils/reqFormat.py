@@ -15,7 +15,10 @@ class reqFormat:
 			return None
 		if request.method.upper() != 'GET':
 			if request.data:
-				return json.loads(request.data.decode('utf-8'), strict=False)
+				try : 
+					return json.loads(request.data.decode('utf-8'), strict=False)
+				except:
+					return json.loads(request.data.decode('cp949'), strict=False)
 		if 'json' in request.args:
 			return json.loads(request.args['json'])
 		if request.args:

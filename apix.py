@@ -8,6 +8,7 @@ from todo.todo import Todo
 ### GPT API ###
 from extractor.extractor import Extractor
 from extractor.cbs import CBS
+from extractor.asiatimes import AsiaTimes
 
 ### NEWS API ###
 from news.news import News
@@ -35,6 +36,8 @@ api = Api(
 
 api.add_namespace(Todo, '/todo')
 api.add_namespace(CBS, '/cbs')
+api.add_namespace(AsiaTimes, '/asiatimes')
+
 api.add_namespace(Extractor, '/extractor')
 api.add_namespace(News, '/news')
 api.add_namespace(Global, '/global')
