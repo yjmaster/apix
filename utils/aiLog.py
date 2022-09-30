@@ -60,8 +60,8 @@ class aiLog:
 		router = (request.url_rule.rule).split("/")[-1]
 		args = reqFormat.parse_data(request)
 		if ('userLogin' in args) and ('userName' in args):
-			userInfo['userLogin'] = args['userLogin']
-			userInfo['userName'] = args['userName']
+			userInfo['user_login'] = args['userLogin']
+			userInfo['user_name'] = args['userName']
 
 		self.DB_CONNECT()
 		self.DB_UPDATE(media, router, userInfo)

@@ -97,7 +97,8 @@ class GPT_title(Resource):
                 
             t = "."
             c = args['contents']
-
+            c = reqFormat.parse_content('asiatimes', c)
+            
             gpt = KoGPT2_inferer_API.inference_TITLE(t, c)
             #gpt = gpt.split("제목 :")[-1]
             gpt = gpt.replace('</s>', '')
@@ -148,6 +149,7 @@ class GPT_section(Resource):
 
             t = args['title']
             c = args['contents']
+            c = reqFormat.parse_content('asiatimes', c)
 
             gpt = KoGPT2_inferer_API.inference_SECTION(t, c)
             #print(gpt)
@@ -197,6 +199,7 @@ class GPT_keyword(Resource):
 
             t = args['title']
             c = args['contents']
+            c = reqFormat.parse_content('asiatimes', c)
 
             gpt = KoGPT2_inferer_API.inference_KEYWORD(t, c)
             #print(gpt)
@@ -246,6 +249,7 @@ class GPT_sentiment(Resource):
 
             t = args['title']
             c = args['contents']
+            c = reqFormat.parse_content('asiatimes', c)
             #c = 'Giberish'
 
             gpt = Senti_inferer_API.inference(t, c)
@@ -296,6 +300,7 @@ class GPT_summarizer(Resource):
 
             t = args['title']
             c = args['contents']
+            c = reqFormat.parse_content('asiatimes', c)
 
             gpt = KoGPT2_inferer_API.inference_SUMMARAZATION(t, c)
             gpt = gpt.split("요약하자면,")[-1]
@@ -346,6 +351,7 @@ class bert(Resource):
 
             t = args['title']
             c = args['contents']
+            c = reqFormat.parse_content('asiatimes', c)
 
             # t = re.sub(r'\(.*?\)|\[.*?\]|\{.*?\}|\<.*?\>', '', args['title'])
             # c = re.sub(r'\(.*?\)|\[.*?\]|\{.*?\}|\<.*?\>', '', args['contents'])
@@ -413,6 +419,8 @@ class textrank(Resource):
                 return make_response(r)
 
             c = args['contents']
+            c = reqFormat.parse_content('asiatimes', c)
+
             textrank = TextRank()
             gpt = textrank.summerizer(c, 5)
             #print(gpt)
@@ -465,6 +473,7 @@ class person_info(Resource):
             args = reqFormat.parse_data(request)
             print(args)
             c = args['name']
+            c = reqFormat.parse_content('asiatimes', c)
             #c = args['extractor']
             ret = Person_inferer_API.inference(c)
             print(ret)
