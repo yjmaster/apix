@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Main</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}"/>
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.kr/docs/5.2/examples/checkout/form-validation.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script src="{{ url_for('static', filename='js/common/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common/main.js') }}"></script>
+    <script>
+      $(document).ready(function(){
+        Main.init();
+      });
+    </script>
+  </head>
+  <body class="bg-light">
+    <div class="container">
+      <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
+        <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+          <img src={{ url_for('static', filename='img/kpf_logo.png') }}  height="50">
+        </a>
+  
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="#" class="nav-link px-2 link-secondary">Home</a></li>
+          <!--
+            <li><a href="#" class="nav-link px-2 link-dark">User</a></li>
+            <li><a href="#" class="nav-link px-2 link-dark">Pricing</a></li>
+            <li><a href="#" class="nav-link px-2 link-dark">FAQs</a></li>
+            <li><a href="#" class="nav-link px-2 link-dark">About</a></li>
+          -->
+        </ul>
+  
+        <div class="col-md-3 text-end">
+          <button type="button" onclick="Utils.logout()" class="btn btn-outline-primary me-2">Logout</button>
+          <!--<button type="button" class="btn btn-primary">Sign-up</button>-->
+        </div>
+      </header>
+    <main>
+      <div class="row g-5 py-4">
+        <div class="col-md-5 col-lg-8 order-md-last">
+          <h5 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">User List</span>
+          <span class="badge bg-primary" id="userCnt"></span>
+          </h5>
+          <div class="list-group-box card p-2">
+            <ul class="list-group mb-3 user-list">
+            </ul>
+          </div>
+
+          <form class="card p-2 serch-box-input">
+            <div class="input-group">
+
+                <select class="form-select" id="option_user" required>
+                  <option value="user_login">id</option>
+                  <option value="user_name">name</option>
+                  <option value="media">media</option>
+                </select>
+                
+                <input type="text" class="form-control search-input" placeholder="" aria-label="Example text with two button addons">
+                <button class="btn btn-outline-secondary" id="search" type="button">검색</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="col-md-7 col-lg-4">
+            <h5 class="mb-3 d-flex justify-content-between align-items-center">
+              <span id="form_type">User Register</span>
+              <span id="reset-btn" class="badge bg-secondary">reset</span>
+            </h5>
+          <form class="needs-validation" novalidate>
+            <div class="row g-3">
+
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="user_login" required
+                    onkeyup="Utils.noSpaceForm(this);" onchange="Utils.noSpaceForm(this);">
+                  <label for="user_login">ID</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="user_name" required
+                    onkeyup="Utils.noSpaceForm(this);" onchange="Utils.noSpaceForm(this);">
+                  <label for="user_name">Name</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="media" required
+                    onkeyup="Utils.noSpaceForm(this);" onchange="Utils.noSpaceForm(this);">
+                  <label for="media">Media</label>
+                </div>
+              </div>
+              
+              <div class="col-12" id="pwd_area">
+                <div class="form-floating">
+                  <input type="password" class="form-control" id="user_pwd1" autocomplete="off" required
+                    onkeyup="Utils.noSpaceForm(this);" onchange="Utils.noSpaceForm(this);">
+                  <label for="user_pwd1">Password</label>
+                </div>
+              </div>
+
+              <div class="col-12" id="pwd_area">
+                <div class="form-floating">
+                  <input type="password" class="form-control" id="user_pwd2" autocomplete="off" required
+                    onkeyup="Utils.noSpaceForm(this);" onchange="Utils.noSpaceForm(this);">
+                  <label for="user_pwd2">Re-password</label>
+                </div>
+              </div>
+
+              <hr class="my-4">
+              <button id="register" mode="register" class="w-100 btn btn-primary btn-lg register-btn" type="button">등록하기</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer class="my-4 text-muted text-center text-small">
+      <p class="mb-1">&copy; 2022 yjmedia</p>
+      <!--
+      <ul class="list-inline">
+        <li class="list-inline-item"><a href="#">Privacy</a></li>
+        <li class="list-inline-item"><a href="#">Terms</a></li>
+        <li class="list-inline-item"><a href="#">Support</a></li>
+      </ul>
+      -->
+    </footer>
+    </div>
+  </body>
+</html>

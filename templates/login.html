@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}"/>
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.kr/docs/5.2/examples/sign-in/signin.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      let isLogin = '{{ msg }}';
+    </script>
+  </head>
+
+  <body class="text-center">
+    <main class="form-signin w-100 m-auto">
+      <form>
+
+        {% if site == 'yjmedia' %}
+          <img class="mb-4" src={{ url_for('static', filename='img/api_logo.png') }}  height="57">
+          <h5 class="h3 mb-3 fw-normal">신사업 개발팀 API</h5>
+        {% elif site == 'kpf' %}
+          <img class="mb-4" src={{ url_for('static', filename='img/kpf_logo.png') }}  height="70">
+        {% else %}
+        
+        {% endif %}
+
+        <div class="form-floating">
+          <input type="text" class="form-control" id="user_login">
+          <label for="user_login">ID</label>
+        </div>
+
+        <div class="form-floating">
+          <input type="password" class="form-control" id="user_pwd" autocomplete="off">
+          <label for="user_pwd">Password</label>
+        </div>
+
+        <!-- <div class="checkbox mb-3">
+          <label>
+            <input type="checkbox" value="remember-me"> 자동로그인
+          </label>
+        </div> -->
+
+        <button class="w-100 btn btn-lg btn-primary" type="button" onclick="userLogin()">로그인</button>
+        <p class="mt-5 mb-3 text-muted">&copy; 2022 yjmedia</p>
+      </form>
+    </main>
+  </body>
+  <script src="{{ url_for('static', filename='js/common/userLogin.js') }}"></script>
+</html>
