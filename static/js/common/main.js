@@ -3,7 +3,8 @@ let Main = {
     console.log("Main init()");
 
     let pathName = window.location.pathname;
-    let apiUrl = 'http://localhost:5000';
+    // let apiUrl = 'http://localhost:5000';
+    let apiUrl = 'http://211.232.77.118:10001';
 
     this.userList = [];
     this.latestOpned = null;
@@ -173,7 +174,7 @@ let Main = {
   setUserYn: function(userData){
     let url = `${this.apiUrl}/auth/yn`;
     userData = JSON.stringify(userData);
-    Utils.call('POST', url, userData, function(res){
+    Utils.call('PUT', url, userData, function(res){
       if(res.success){
         $('#reset-btn').click();
       }

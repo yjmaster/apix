@@ -4,16 +4,17 @@ let media = '';
 let login_url = '';
 let main_url = '';
 let pathName = window.location.pathname;
-let url = 'http://localhost:5000';
+// let apiUrl = 'http://localhost:5000';
+let apiUrl = 'http://211.232.77.118:10001';
 
 if(pathName.includes('kpf')){
     media = "kpf";
-    login_url = `${url}/${media}/login`;
-    main_url = `${url}/${media}`;
+    login_url = `${apiUrl}/${media}/login`;
+    main_url = `${apiUrl}/${media}`;
 }else{
     media = "yjmedia";
-    login_url = `${url}/login`;
-    main_url = `${url}/`;
+    login_url = `${apiUrl}/login`;
+    main_url = `${apiUrl}/`;
 }
 
 if(isLogin !== ''){

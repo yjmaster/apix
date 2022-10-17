@@ -20,7 +20,8 @@ class UserDb:
 		self.conn.query("set character_set_database=utf8;")
 
 	def create_token(self, userInfo):
-		access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256")
+		access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256").decode('utf-8') #서버
+		#access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256") #로컬
 		return access_token
 
 	def create_user(self, userInfo):
@@ -84,9 +85,9 @@ class UserDb:
 			curs.execute(_SQL)
 
 			if userInfo['useYn'] == 'Y':
-				returnStatus['message'] = "Inactive user"
-			elif userInfo['useYn'] == 'N':
 				returnStatus['message'] = "Active user"
+			elif userInfo['useYn'] == 'N':
+				returnStatus['message'] = "Inactive user"
     
 		except Exception as exp :
 			returnStatus['success'] = False
@@ -108,8 +109,13 @@ class UserDb:
 				returnStatus['message'] = "user that exists"
 		
 		elif self.type == 'update':
-			returnStatus['success'] = True
-			returnStatus['message'] = "User has been modified"
+			affectedCnt =  userCurs.rowcount
+			if affectedCnt > 0:
+				returnStatus['success'] = True
+				returnStatus['message'] = "User has been modified"
+			else:
+				returnStatus['success'] = False
+				returnStatus['message'] = "User information does not exist."
 
 		elif self.type == 'yn':
 			isUser = userCurs.fetchone()
@@ -221,9 +227,9 @@ class UserDb:
 			elif self.type == 'update':
 				_SQL = """UPDATE api_users SET\n"""
     
-				if 'media' in userData:
-					_SQL += "media = '{media}',\n".format(
-						media = userData['media'])
+				# if 'media' in userData:
+				# 	_SQL += "media = '{media}',\n".format(
+				# 		media = userData['media'])
 
 				if 'user_name' in userData:
 					_SQL += "user_name = '{user_name}',\n".format(
@@ -237,7 +243,11 @@ class UserDb:
 				_SQL += "WHERE 1=1\n"
 				_SQL += "AND user_login = '{user_login}'\n".format(
 					user_login = userData['user_login'])
-
+				_SQL += "AND media = '{media}'\n".format(
+					media = userData['media'])
+    
+				#print(_SQL)
+    
 			elif self.type == 'get':
 				_SQL = """SELECT * FROM api_users
 					WHERE 1=1\n"""
