@@ -2,15 +2,9 @@ let Main = {
   init: function(){
     console.log("Main init()");
 
-    let apiUrl = '';
-    let os = Utils.getOS();
     let pathName = window.location.pathname;
-
-    if(os === 'Windows'){
-      apiUrl = 'http://localhost:5000';
-    }else{
-      apiUrl = 'http://211.232.77.118:10001';
-    };
+    // let apiUrl = 'http://localhost:5000';
+    let apiUrl = 'http://211.232.77.118:10001';
 
     this.userList = [];
     this.latestOpned = null;
