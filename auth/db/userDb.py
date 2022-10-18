@@ -2,6 +2,7 @@ from copyreg import constructor
 import jwt
 import hashlib
 import pymysql
+import platform
 
 class UserDb:
 	def __init__(self, host='192.168.0.190', user='maria', password='maria123', db='maria_DB'):
@@ -20,8 +21,11 @@ class UserDb:
 		self.conn.query("set character_set_database=utf8;")
 
 	def create_token(self, userInfo):
-		access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256").decode('utf-8') #서버
-		#access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256") #로컬
+		access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256")
+		osName = platform.system()
+		if osName != 'Windows':
+			access_token = access_token.decode('utf-8')
+
 		return access_token
 
 	def create_user(self, userInfo):

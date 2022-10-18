@@ -2,9 +2,15 @@ let Main = {
   init: function(){
     console.log("Main init()");
 
+    let apiUrl = '';
+    let os = Utils.getOS();
     let pathName = window.location.pathname;
-    // let apiUrl = 'http://localhost:5000';
-    let apiUrl = 'http://211.232.77.118:10001';
+
+    if(os === 'Windows'){
+      apiUrl = 'http://localhost:5000';
+    }else{
+      apiUrl = 'http://211.232.77.118:10001';
+    };
 
     this.userList = [];
     this.latestOpned = null;
@@ -94,9 +100,27 @@ let Main = {
     if(clickedBtn === 'token'){
       let rowIdx = targetRow.index();
       let access_token = this.userList[rowIdx].access_token;
-      window.navigator.clipboard.writeText(access_token).then(() => {
-        alert("token copied");
-      });
+
+      let textArea = document.createElement("textarea");
+      textArea.value = access_token;
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try{
+        let successful = document.execCommand('copy');
+        let msg = successful ? 'token copied' : 'token copy failed';
+        alert(msg);
+      }catch(err){
+        console.error('Was not possible to copy te text: ', err);
+      };
+
+      document.body.removeChild(textArea);
+      return;
+      // window.navigator.clipboard.writeText(access_token).then(() => {
+      //   alert("token copied");
+      // });
     }else{
       let useYn = (clickedBtn === 'disabled' ? 'N' : 'Y');
       let user_login = $(targetRow).find('#user_login_list').text();

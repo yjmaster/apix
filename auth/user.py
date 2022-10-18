@@ -114,7 +114,7 @@ class Delete(Resource):
         ``` json
         {
             "success": true,
-            "message": "User has been deleted"
+            "message": "Inactive user"
         }
         ```
         """

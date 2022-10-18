@@ -3,9 +3,15 @@ console.log("userLogin.js");
 let media = '';
 let login_url = '';
 let main_url = '';
+let apiUrl = '';
+let os = Utils.getOS();
 let pathName = window.location.pathname;
-// let apiUrl = 'http://localhost:5000';
-let apiUrl = 'http://211.232.77.118:10001';
+
+if(os === 'Windows'){
+  apiUrl = 'http://localhost:5000';
+}else{
+  apiUrl = 'http://211.232.77.118:10001';
+};
 
 if(pathName.includes('kpf')){
     media = "kpf";
