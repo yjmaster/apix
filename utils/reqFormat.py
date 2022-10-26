@@ -44,5 +44,10 @@ class reqFormat:
 			for editor in content.select('div.article_editor_container') : editor.extract()
 			# 바이라인 제거
 			content = re.sub(r'\[아시아타임즈=(.+)]', '', content.text).strip()
+			# 특수기호 기본문자로 변경
+			content = re.sub('\“', '\"', content)
+			content = re.sub('\”', '\"', content)
+			content = re.sub('\‘', '\'', content)
+			content = re.sub('\’', '\'', content)
 
 		return content
