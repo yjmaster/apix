@@ -288,6 +288,40 @@ class GPT_summarizer(Resource):
         """
 
         r = None
+        try:
+            r = {"success": True, "extractor": '서비스 준비중 입니다.'}
+        except Exception as exp:
+            r = {"success": False, "message": str(exp)}
+        finally:
+            return make_response(r)  
+################################################################################
+
+################################################################################
+@AsiaTimes.route('/GPT-summarizer_')
+class GPT_summarizer(Resource):
+    @AsiaTimes.doc(parser=asia_req)
+    @AsiaTimes.response(200, 'API Success/Failure', asia_res)
+    @AsiaTimes.response(400, 'Failure')
+    @AsiaTimes.response(500, 'Error')
+    def post(self):
+        """
+        요약문 생성(GPT2) API 입니다.
+        
+        ## Input Arguments 를 JSON 형식으로 전달합니다.
+        
+        **title**: str : required **(필수)** : 기사의 제목 입니다.
+
+        **contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
+        
+        # Output Arguments
+        ``` json
+        {
+            "extractor": "집단감염 우려 속에 서울 도심에서 강행된 광복절 집회에서 경찰에 폭력을 행사하는 등 공무집행을 방해한 참가자 2명이 18일 오후 구속심사를 받기 위해 법원에 출석했다. 2명 중 1명은 지난달 국회를 방문한 문재인 대통령을 향해 신발을 던졌던 정창옥(57)씨다. 그는 현행범으로 체포돼 경찰에서 조사를 받았다. 오후 2시 35분께 법원 앞에 모습을 드러낸 정씨는 '두 번째 영장심사인데 심경은 어떤가'라는 취재진 질문에 \"담담하다, 괜찮다\"며 \"왜 구속이 됐는지 모르겠고, 그냥 평화적으로 청와대로 가는 사람을 붙잡았다."
+        }        
+        ```
+        """
+
+        r = None
         # atlog = AuditLog('[AAA] Login checking')
         try:
             log.wirte_log('asiatimes', request)
@@ -313,6 +347,7 @@ class GPT_summarizer(Resource):
         finally:
             return make_response(r)  
 ################################################################################
+
 @AsiaTimes.route('/bert')
 class bert(Resource):
     @AsiaTimes.doc(parser=asia_req)
