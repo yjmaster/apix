@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, render_template
 from flask_restx import Resource, Api, apidoc
 from flask_cors import CORS, cross_origin
 
@@ -12,6 +12,9 @@ userDb = UserDb()
 
 ### sample ###
 from todo.todo import Todo 
+
+### kobart ###
+from kobart.kobart import Kobart
 
 ### GPT API ###
 from extractor.extractor import Extractor
@@ -57,6 +60,7 @@ def custom_ui():
 
 api.add_namespace(Todo, '/todo')
 api.add_namespace(Auth, '/auth')
+api.add_namespace(Kobart, '/kobart')
 api.add_namespace(CBS, '/cbs')
 api.add_namespace(AsiaTimes, '/asiatimes')
 
