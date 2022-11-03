@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Kobart 테스트</title>
+  </head>
+
+  <body>
+    <div id="textToSynth">
+      <textarea style="width:1000px;height:400px;font-size:20px;text-align:center; display:block; margin: 0 auto;" type="text" id="textEntry"></textarea>
+      <button class="btn default" onClick="test()">제목 생성</button>
+      <button class="btn default" onClick="clean()">지우기</button>
+      <p id="title">제목 : </p>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function test() {
+            var obj = document.getElementById("textEntry").value;
+            document.getElementById("title").innerHTML = "제목 : 생성중입니다 기다려주세요"
+            $.ajax({
+                type: "get",
+                url: "/kobart?text=" + obj,
+                dataType: "text",
+                success: function(response){
+                    var returnedData = JSON.parse(response);
+                    document.getElementById("title").innerHTML = "제목 : " + returnedData['title'] 
+                }
+            })
+        }
+
+        function clean() {
+            document.getElementById("textEntry").value = "";
+        }
+    </script>
+  </body>
+</html>
