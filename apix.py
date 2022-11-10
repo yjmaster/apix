@@ -14,7 +14,7 @@ userDb = UserDb()
 from todo.todo import Todo 
 
 ### kobart ###
-from kobart.kobart import Kobart
+from modelAI.kobart import Kobart
 
 ### GPT API ###
 from extractor.extractor import Extractor

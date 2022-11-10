@@ -23,7 +23,7 @@
                 dataType: "text",
                 success: function(response){
                     var returnedData = JSON.parse(response);
-                    document.getElementById("title").innerHTML = "제목 : " + returnedData['title'] 
+                    document.getElementById("title").innerHTML = "제목 : " + returnedData['extractor'] 
                 }
             })
         }
