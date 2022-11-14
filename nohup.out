@@ -2607,3 +2607,9 @@ summary_inference_API init()
 192.168.0.122 - - [14/Nov/2022 11:13:39] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
 192.168.0.122 - - [14/Nov/2022 11:14:05] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
 192.168.0.122 - - [14/Nov/2022 11:16:44] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
+192.168.0.122 - - [14/Nov/2022 11:17:30] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
+192.168.0.122 - - [14/Nov/2022 11:18:17] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
+192.168.0.122 - - [14/Nov/2022 11:18:44] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
+192.168.0.122 - - [14/Nov/2022 11:20:10] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
+192.168.0.122 - - [14/Nov/2022 11:20:30] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
+192.168.0.122 - - [14/Nov/2022 11:20:53] "[37mPOST /kobart/keywordai HTTP/1.1[0m" 200 -
