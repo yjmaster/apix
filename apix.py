@@ -11,25 +11,27 @@ from auth.db.userDb import UserDb
 userDb = UserDb()
 
 ### sample ###
-from todo.todo import Todo 
+# from todo.todo import Todo 
 
 ### kobart ###
-from modelAI.kobart import Kobart
+# from modelAI.kobart import Kobart
 
 ### GPT API ###
-from extractor.extractor import Extractor
-from extractor.cbs import CBS
-from extractor.asiatimes import AsiaTimes
+# from extractor.extractor import Extractor
+# from extractor.cbs import CBS
+# from extractor.asiatimes import AsiaTimes
 
 ### NEWS API ###
-from news.news import News
+# from news.news import News
 
 ### VOUCHER API ###
-from voucher.asiatimes import Global
-from voucher.googleApi import Google_Api
-from voucher.hans import ESG
-from voucher.news2day import NEWS2DAY
-from voucher.news2dayElastic import NEWS2DAY_ELASTIC
+# from voucher.asiatimes import Global
+# from voucher.googleApi import Google_Api
+# from voucher.hans import ESG
+# from voucher.news2day import NEWS2DAY
+# from voucher.news2dayElastic import NEWS2DAY_ELASTIC
+
+from testWork.testRoute import TestRoute
 
 app = Flask(__name__)
 CORS(app)
@@ -58,20 +60,21 @@ def custom_ui():
         return apidoc.ui_for(api)
     
 
-api.add_namespace(Todo, '/todo')
-api.add_namespace(Auth, '/auth')
-api.add_namespace(Kobart, '/kobart')
-api.add_namespace(CBS, '/cbs')
-api.add_namespace(AsiaTimes, '/asiatimes')
+# api.add_namespace(Todo, '/todo')
+# api.add_namespace(Auth, '/auth')
+# api.add_namespace(Kobart, '/kobart')
+# api.add_namespace(CBS, '/cbs')
+# api.add_namespace(AsiaTimes, '/asiatimes')
 
-api.add_namespace(Extractor, '/extractor')
-api.add_namespace(News, '/news')
-api.add_namespace(Global, '/global')
-api.add_namespace(Google_Api, '/google')
-api.add_namespace(NEWS2DAY_ELASTIC, '/esg')
+# api.add_namespace(Extractor, '/extractor')
+# api.add_namespace(News, '/news')
+# api.add_namespace(Global, '/global')
+# api.add_namespace(Google_Api, '/google')
+# api.add_namespace(NEWS2DAY_ELASTIC, '/esg')
 # api.add_namespace(ESG, '/esg')
 # api.add_namespace(NEWS2DAY, '/news2day')
+api.add_namespace(TestRoute, '/testRoute')
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=10001) #실제 운영 API 
-    #app.run(debug=True, port=5000) # 테스트 API
+    # app.run(debug=False, host='0.0.0.0', port=10001) #실제 운영 API
+    app.run(debug=True, port=5000) # 테스트 API
