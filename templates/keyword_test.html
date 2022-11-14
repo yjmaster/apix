@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Kobart 테스트</title>
+  </head>
+
+  <body>
+    <div id="textToSynth">
+      <textarea style="width:1000px;height:400px;font-size:20px;text-align:left; display:block; margin: 0 auto;" type="text" id="textEntry"></textarea>
+      <button class="btn default" onClick="test()">키워드 생성</button>
+      <button class="btn default" onClick="clean()">지우기</button>
+      <p id="keyword" style="font-size:20px">키워드 : </p>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function test() {
+            var obj = document.getElementById("textEntry").value;
+            var settings = {
+              "url": "/kobart/keyword",
+              "method": "POST",
+              "timeout": 0,
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "data": JSON.stringify({
+                "contents":obj
+              }),
+            };
+            document.getElementById("keyword").innerHTML = "키워드 : 생성중입니다 기다려주세요"
+            $.ajax(settings).done(function (response) {
+              if(response['success'] == true) {
+                document.getElementById("keyword").innerHTML = "키워드 : " + response['extractor'] 
+                console.log(response)
+              } else {
+                document.getElementById("keyword").innerHTML = "키워드 : " + response['message'] 
+                console.log(response)
+              }
+            });
+        }
+
+        function clean() {
+            document.getElementById("textEntry").value = "";
+        }
+    </script>
+  </body>
+</html>
