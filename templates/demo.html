@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AI 테스트</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.mCustomScrollbar.css') }}"/>
+	<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+	<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+	<script src="{{ url_for('static', filename='js/comMon.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/demo.js') }}"></script>
+</head>
+
+<body>
+	<div id="wraper">
+		<div class="edit_wrap">
+			<div class="tit_wrap">
+				<h1><span>YJMEDIA</span> <span>NEWS AI</span> TEST (언론재단)</h1>
+				<p>본 화면은 언론 재단에 공급하는 NEWS AI(Title Generator, Keyword Extractor etc.)를 테스트하기 위한 화면입니다.</p>
+			</div>
+			<div class="text_wrap">
+				<textarea style="width: 100%; height: 7%; font-size:14px; resize: none; overflow: hidden;" type="text" id="textTitle"></textarea>
+
+				<textarea style="width: 100%; height: 93%; font-size:14px; resize: none;" type="text" id="textContent"></textarea>
+			</div>
+			<div id="extraction" class="btn_wrap">
+				<button type="button" name="title" class="btn">Title</button>
+				<button type="button" name="keyword" class="btn">Keyword</button>
+				<button type="button" disabled name="summarize" class="btn">Summarize</button>
+				<button type="button" name="reset" class="btn" style="float: right;">Reset</button>
+			</div>
+			<div>
+                <textarea style="width: 100%; height: 100%; font-size:14px; resize: none; border: 1px solid #dcdcdc;" type="text" id="textResult"></textarea>
+            </div>
+		</div>
+	</div>
+</body>

@@ -1,5 +1,6 @@
 let Utils = {
 	call: function(method, url, data, callback){
+		console.log(data)
 		$.ajax({
 			url: url,
 			contentType: 'application/json',

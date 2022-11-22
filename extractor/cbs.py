@@ -5,7 +5,7 @@ from flask_restx import Resource, Namespace, fields
 
 # custom modules
 from utils.aiLog import aiLog
-from utils.reqFormat import reqFormat
+from utils.textFormat import reqFormat
 
 log = aiLog()
 

@@ -22,17 +22,9 @@
 
   <body class="text-center">
     <main class="form-signin w-100 m-auto">
-      <form>
-
-        {% if site == 'yjmedia' %}
-          <img class="mb-4" src={{ url_for('static', filename='img/api_logo.png') }}  height="57">
-          <h5 class="h3 mb-3 fw-normal">신사업 개발팀 API</h5>
-        {% elif site == 'kpf' %}
-          <img class="mb-4" src={{ url_for('static', filename='img/kpf_logo.png') }}  height="70">
-        {% else %}
+      <form>  
+        <img class="mb-4" src={{ url_for('static', filename='img/kpf_logo.png') }}  height="70">
         
-        {% endif %}
-
         <div class="form-floating">
           <input type="text" class="form-control" id="user_login">
           <label for="user_login">ID</label>
@@ -50,7 +42,7 @@
         </div> -->
 
         <button class="w-100 btn btn-lg btn-primary" type="button" onclick="userLogin()">로그인</button>
-        <p class="mt-5 mb-3 text-muted">&copy; 2022 yjmedia</p>
+        <p class="mt-5 mb-3 text-muted">&copy; 2022</p>
       </form>
     </main>
   </body>
