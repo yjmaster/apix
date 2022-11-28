@@ -8,16 +8,17 @@
   <body>
     <div id="textToSynth">
       <textarea style="width:1000px;height:400px;font-size:20px;text-align:left; display:block; margin: 0 auto;" type="text" id="textEntry"></textarea>
-      <button class="btn default" onClick="test()">요약 생성</button>
+      <button class="btn default" onClick="test()">토픽 생성</button>
       <button class="btn default" onClick="clean()">지우기</button>
-      <p id="title" style="font-size:20px">요약 : </p>
+      <p id="title" style="font-size:20px">토픽 : </p>
+      <p style="font-size:20px">참고 : 본문이 길면 다른API보다 시간이 더 걸릴 수 있습니다. 기다려주세요 제발</p>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">
         function test() {
           var obj = document.getElementById("textEntry").value;
           var settings = {
-            "url": "/kobart/summary",
+            "url": "/kobart/topic",
             "method": "POST",
             "timeout": 0,
             "headers": {
@@ -27,14 +28,14 @@
               "contents":obj
             }),
           };
-          document.getElementById("title").innerHTML = "요약 : 생성중입니다 기다려주세요"
+          document.getElementById("title").innerHTML = "토픽 : 생성중입니다 기다려주세요"
 
           $.ajax(settings).done(function (response) {
             if(response['success'] == true){
-              document.getElementById("title").innerHTML = "요약 : " + response['extractor'].replace('\n', '<br>').replace('\n', '<br>')  
+              document.getElementById("title").innerHTML = "토픽 : " + response['extractor'].replace('\n', '<br>').replace('\n', '<br>')  
               console.log(response)
             } else {
-              document.getElementById("title").innerHTML = "요약 : " + response['message'] 
+              document.getElementById("title").innerHTML = "토픽 : " + response['message'] 
               console.log(response)
             }
           });

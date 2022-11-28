@@ -16,6 +16,9 @@ three_api = three_inference_API()
 from summary_modules.inference import summary_inference_API
 summary_api = summary_inference_API()
 
+from classification_modules.inference import classification_inference_API
+classification_api = classification_inference_API()
+
 Kobart = Namespace(
     name="kobart",
     description="kobart 테스트 API.",
@@ -78,7 +81,7 @@ class KobartKeyword(Resource):
             return make_response(r)
         
 @Kobart.route('/keywordai')
-class KobartKeyword(Resource):
+class KobartKeywordAI(Resource):
     def post(self):
         """kobart 모델을 통해 키워드를 가져옵니다."""
 
@@ -102,7 +105,7 @@ class KobartKeyword(Resource):
             return make_response(r)
 
 @Kobart.route('/ner')
-class KobartKeyword(Resource):
+class KobartKeywordNer(Resource):
     def post(self):
         """ner 모델을 통해 개체명을 가져옵니다."""
         try:
@@ -122,7 +125,7 @@ class KobartKeyword(Resource):
             return make_response(r)
         
 @Kobart.route('/summary')
-class KobartTitle(Resource):
+class KobartSummary(Resource):
     def post(self):
         """kobart 모델을 통해 요약을 가져옵니다."""
         
@@ -133,13 +136,109 @@ class KobartTitle(Resource):
                 return make_response(r)
             contents.replace("/n", "")
             
-            summary_result = summary_api.summary(contents)
+            summary_result = kobart_api.kobart_summary(contents)
             
             if summary_result == "기사가 너무 깁니다. 줄여주세요":
                 r = {"success": False, "message": "기사가 너무 깁니다. 줄여주세요"}
                 return make_response(r)
             
             r = {"success": True, "extractor": summary_result}
+        except Exception as exp:
+            r = {"success": False, "message": str(exp)}
+        finally:
+            return make_response(r)
+
+@Kobart.route('/summary_aihub')
+class KobartSummaryAIhub(Resource):
+    def post(self):
+        """kobart 모델을 통해 요약을 가져옵니다."""
+        
+        try:
+            contents = request.get_json()['contents']
+            if len(contents) == 0:
+                r = {"success": False, "message": "NO INPUT"}
+                return make_response(r)
+            contents.replace("/n", "")
+            
+            summary_aihub_result = kobart_api.kobart_summary_aihub(contents)
+            
+            if summary_aihub_result == "기사가 너무 깁니다. 줄여주세요":
+                r = {"success": False, "message": "기사가 너무 깁니다. 줄여주세요"}
+                return make_response(r)
+            
+            r = {"success": True, "extractor": summary_aihub_result}
+        except Exception as exp:
+            r = {"success": False, "message": str(exp)}
+        finally:
+            return make_response(r)
+
+@Kobart.route('/summary_short')
+class KobartSummaryShort(Resource):
+    def post(self):
+        """kobart 모델을 통해 요약을 가져옵니다."""
+        
+        try:
+            contents = request.get_json()['contents']
+            if len(contents) == 0:
+                r = {"success": False, "message": "NO INPUT"}
+                return make_response(r)
+            contents.replace("/n", "")
+            
+            summary_short_result = kobart_api.kobart_summary_short(contents)
+            
+            if summary_short_result == "기사가 너무 깁니다. 줄여주세요":
+                r = {"success": False, "message": "기사가 너무 깁니다. 줄여주세요"}
+                return make_response(r)
+            
+            r = {"success": True, "extractor": summary_short_result}
+        except Exception as exp:
+            r = {"success": False, "message": str(exp)}
+        finally:
+            return make_response(r)
+
+@Kobart.route('/topic')
+class KobartTopic(Resource):
+    def post(self):
+        """kobart 모델을 통해 토픽을 가져옵니다."""
+        
+        try:
+            contents = request.get_json()['contents']
+            if len(contents) == 0:
+                r = {"success": False, "message": "NO INPUT"}
+                return make_response(r)
+            contents.replace("/n", "")
+            
+            topic_result = classification_api.topic(contents)
+            
+            if topic_result == "기사가 너무 깁니다. 줄여주세요":
+                r = {"success": False, "message": "기사가 너무 깁니다. 줄여주세요"}
+                return make_response(r)
+            
+            r = {"success": True, "extractor": topic_result}
+        except Exception as exp:
+            r = {"success": False, "message": str(exp)}
+        finally:
+            return make_response(r)
+
+@Kobart.route('/sentiment')
+class KobartSentiment(Resource):
+    def post(self):
+        """kobart 모델을 통해 감정을 가져옵니다."""
+        
+        try:
+            contents = request.get_json()['contents']
+            if len(contents) == 0:
+                r = {"success": False, "message": "NO INPUT"}
+                return make_response(r)
+            contents.replace("/n", "")
+            
+            sentiment_result = classification_api.sentiment(contents)
+            
+            if sentiment_result == "기사가 너무 깁니다. 줄여주세요":
+                r = {"success": False, "message": "기사가 너무 깁니다. 줄여주세요"}
+                return make_response(r)
+            
+            r = {"success": True, "extractor": sentiment_result}
         except Exception as exp:
             r = {"success": False, "message": str(exp)}
         finally:
@@ -158,19 +257,43 @@ class KobartKeywordTest(Resource):
         return make_response(render_template('keyword_test.html'),200,headers)
     
 @Kobart.route('/keyword/testai')
-class KobartKeywordTest(Resource):
+class KobartKeywordTestAI(Resource):
     def get(self):
         headers = {'Content-Type': 'text/html'}
         return make_response(render_template('keyword_testai.html'),200,headers)
     
 @Kobart.route('/keyword/testner')
-class KobartKeywordTest(Resource):
+class KobartKeywordTestNer(Resource):
     def get(self):
         headers = {'Content-Type': 'text/html'}
         return make_response(render_template('keyword_testner.html'),200,headers)
     
 @Kobart.route('/summary/test')
-class KobartKeywordTest(Resource):
+class KobartSummaryTest(Resource):
     def get(self):
         headers = {'Content-Type': 'text/html'}
         return make_response(render_template('summary_test.html'),200,headers)
+    
+@Kobart.route('/summary_aihub/test')
+class KobartSummaryAIhubTest(Resource):
+    def get(self):
+        headers = {'Content-Type': 'text/html'}
+        return make_response(render_template('summary_aihub_test.html'),200,headers)
+
+@Kobart.route('/summary_short/test')
+class KobartSummaryShortTest(Resource):
+    def get(self):
+        headers = {'Content-Type': 'text/html'}
+        return make_response(render_template('summary_short_test.html'),200,headers)
+
+@Kobart.route('/topic/test')
+class KobartTopicTest(Resource):
+    def get(self):
+        headers = {'Content-Type': 'text/html'}
+        return make_response(render_template('summary_topic_test.html'),200,headers)
+
+@Kobart.route('/sentiment/test')
+class KobartSentimentTest(Resource):
+    def get(self):
+        headers = {'Content-Type': 'text/html'}
+        return make_response(render_template('summary_sentiment_test.html'),200,headers)
