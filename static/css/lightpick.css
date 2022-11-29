@@ -1,0 +1,250 @@
+.lightpick-container {
+    width: 250px;
+    position: absolute;
+    z-index: 9999;
+    background-color: #fff;
+    line-height: normal;
+    box-shadow: 0 4px 9px 0px rgba(68, 68, 68, 0.48);
+}
+
+.lightpick-container,
+.lightpick-container *,
+.lightpick-container:after,
+.lightpick-container:before {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.lightpick-container.is-hidden {
+    display: none;
+}
+
+.lightpick-container.rows-2 {
+    width: 500px;
+}
+
+.lightpick-container.rows-3 {
+    width: 750px;
+}
+
+.lightpick-container.rows-4 {
+    width: 1000px;
+}
+
+.lightpick-container.rows-5 {
+    width: 1250px;
+}
+
+.lightpick-container > .months {
+    display: -moz-webkit-flex;
+    display: -ms-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}
+
+.lightpick-container > .months > .month {
+    padding: 5px;
+    width: 250px;
+    border: 1px solid #eee;
+}
+
+.lightpick-container > .months > .month:hover > .title {
+    color: #4285f4;
+}
+
+.lightpick-container > .months > .month > .title {
+    padding: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #757575;
+    display: -moz-webkit-flex;
+    display: -ms-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    line-height: 24px;
+}
+
+.lightpick-container > .top-buttons {
+    text-align: right;
+    border: 1px solid #eee;
+    padding: 6px;
+}
+
+.lightpick-container > .top-buttons > button {
+    margin-left: 5px;
+    padding: 0 5px;
+    font-size: 12px;
+    line-height: 24px;
+    font-weight: 600
+}
+
+.lightpick-container > .top-buttons > button.close {
+    font-size: 18px;
+}
+
+.lightpick-container .prev,
+.lightpick-container .next {
+    border: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 0;
+    outline: none;
+}
+
+.lightpick-container .prev:hover,
+.lightpick-container .next:hover {
+    background-color: rgba(0, 0, 0, .07);
+    cursor: pointer;
+}
+
+.lightpick-container > .months > .month > .daynames {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: (1fr)[7];
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    padding: 5px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #757575;
+}
+
+.lightpick-container > .months > .month > .days {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: (1fr)[7];
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 10px;
+}
+
+.lightpick-container > .months > .month > .days > .day {
+    padding: 7px 0;
+    color: #212121;
+    font-size: 11px;
+    border-radius: 0;
+}
+
+.lightpick-container > .months > .month > .days > .day:hover {
+    background-color: rgb(224, 224, 224);
+    cursor: pointer;
+}
+
+.lightpick-container > .months > .month > .days > .day.today {
+    font-weight: 500;
+    background-color: rgb(205, 220, 57);
+}
+
+.lightpick-container > .months > .month > .days > .day.prev-month,
+.lightpick-container > .months > .month > .days > .day.next-month {
+    color: #757575;
+}
+
+.lightpick-container > .months > .month > .days > .day.disabled {
+    color: #ddd;
+    text-decoration: line-through;
+    background-color: #fff;
+}
+
+.lightpick-container > .months > .month > .days > .day.in-range {
+    background-color: rgba(66, 133, 244, .7);
+    color: #fff;
+    border-radius: 0;
+}
+
+.lightpick-container > .months > .month > .days > .day.start-date.in-range,
+.lightpick-container > .months > .month > .days > .day.end-date.in-range.invert {
+    /*border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;*/
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.lightpick-container > .months > .month > .days > .day.end-date.in-range,
+.lightpick-container > .months > .month > .days > .day.start-date.in-range.invert {
+    /*border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;*/
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.lightpick-container > .months > .month > .days > .day.start-date.end-date {
+    border-radius: 0;
+}
+
+.lightpick-container > .months > .month > .days > .day.start-date,
+.lightpick-container > .months > .month > .days > .day.end-date,
+.lightpick-container > .months > .month > .days > .day.start-date:hover,
+.lightpick-container > .months > .month > .days > .day.end-date:hover {
+    color: #fff;
+    font-weight: 500;
+    background-color: rgb(66, 133, 244);
+}
+
+
+.lightpick__select {
+    border: none;
+    background-color: transparent;
+    outline: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* explorer 11 version */
+.lightpick__select::-ms-expand{
+    display: none;
+}
+
+.lightpick__select:disabled {
+    color: #333;
+}
+
+.lightpick__select-months {
+    font-weight: bold;
+    font-size: 1em;
+    margin-right: .5em;
+}
+
+@media screen and (-ms-high-contrast: active),
+(-ms-high-contrast: none) {
+    .lightpick-container > .months > .month > .daynames {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: start;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+    }
+
+    .lightpick-container > .months > .month > .daynames > div {
+        width: 31.3px;
+    }
+
+    .lightpick-container > .months > .month > .days {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-flow: row wrap;
+        flex-flow: row wrap;
+        -webkit-box-pack: start;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+    }
+
+    .lightpick-container > .months > .month > .days > .day {
+        width: 31.3px;
+    }
+}

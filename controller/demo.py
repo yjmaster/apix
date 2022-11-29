@@ -4,10 +4,19 @@ from . import kpf
 
 # userDb = UserDb()
 
-@kpf.route('/demo', methods=['GET','POST'])
+@kpf.route('/demo', methods=['GET'])
 def demo():
-    if request.method == 'GET':
-        return render_template('demo.html')
+    return render_template('demo.html')
+
+@kpf.route('/log', methods=['GET'])
+def log():
+    return render_template('log.html')
+
+@kpf.route('/media', methods=['POST'])
+def media():
+    data = request.get_json()
+    print(data)
+
 
 # @kpf.route('/title', methods=['POST'])
 # def title():

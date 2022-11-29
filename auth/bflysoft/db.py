@@ -17,43 +17,43 @@ class BflysoftDb:
 
 	def authentication(self, id_client):
 		try:
-			returnStatus = {'success': False}
-
 			self.connect_db()
-
-			_SQL = """SELECT NM_CLIENT, FG_NEWSAI_USE
+			res = {'success': False}
+			
+			_SQL = """SELECT
+					NM_CLIENT,
+					FG_NEWSAI_USE
 				FROM tbs_api_client
 				WHERE 1=1
 				AND ID_CLIENT = '{ID_CLIENT}'""".format(
 					ID_CLIENT = id_client
 				)
 
-			print(_SQL)
+			# print(_SQL)
 
 			curs = self.conn.cursor()
 			curs.execute(_SQL)
 
-			message = ''
 			isUser = curs.fetchone()
-			if isUser :
-				NM_CLIENT = isUser[0]
-				FG_NEWSAI_USE = isUser[1]
+			if not isUser :
+				res['message'] = '존재하지 않는 사용자 입니다.'
+				res['code'] = 401
+				return
 
-				if FG_NEWSAI_USE == 'Y':
-					returnStatus['success'] = True
-					returnStatus['media'] = NM_CLIENT
-				else:
-					message = 'User is not authenticated'
-			else:
-				message = 'User does not exist'
-				returnStatus['message'] = message
+			NM_CLIENT = isUser[0]
+			FG_NEWSAI_USE = isUser[1]
+
+			if FG_NEWSAI_USE == 'N':
+				res['message'] = 'NEWS AI 사용 등록이 되지 않았습니다.'
+				res['code'] = 403
+				return
+
+			res['success'] = True
+			res['media'] = NM_CLIENT
 
 		except Exception as exp :
-			returnStatus['success'] = False
-			returnStatus['message'] = str(exp)
-
+			res = {"success": False, "message": str(exp)}
 		finally:
 			self.conn.cursor().close()
 			self.conn.close()
-
-			return returnStatus
+			return res

@@ -67,7 +67,7 @@ class TextFormat:
 
 		return content
 
-	def punctuationMarks(self, content):
+	def quoteReplace(self, content):
 		content = re.sub('\“', '\"', content)
 		content = re.sub('\”', '\"', content)
 		content = re.sub('\‘', '\'', content)
@@ -91,16 +91,15 @@ class TextFormat:
 		return content
 
 	def contentAnalysis(self, content):
-		returnStatus = {"rowNum": 0, "summary": ""}
 		self.temp_list = []
 		self.sent_list = []
 		fullSent_list = []
-		textLen = 0
+		# textLen = 0
 
 		# ()안에 문장이 한글이면 삭제
-		content = self.removeBracket(content)
+		#content = self.removeBracket(content)
 
-		content = self.punctuationMarks(content)
+		content = self.quoteReplace(content)
 
 		# (), "" 문구 안에 문장이 짤리면 안됨
 		content = self.separateExtraction(content)
@@ -118,21 +117,19 @@ class TextFormat:
 			fullSent = self.mappingSentIndex(sent)
 			fullSent = fullSent.strip()
 			if len(fullSent) != 0:
-				textLen += len(fullSent)
-				if textLen <= 1024:
-					fullSent_list.append(fullSent)
+				# textLen += len(fullSent)
+				# if textLen <= 1024:
+				fullSent_list.append(fullSent)
 		
 		for idx, sent in enumerate(fullSent_list):
 			if(idx == 0 and re.match(r"\".+\"", sent)):
 				fullSent_list.pop(0)
 
-		for idx, sent in enumerate(fullSent_list):
-			if idx < 3:
-				returnStatus["summary"] += sent
+		# for idx, sent in enumerate(fullSent_list):
+		# 	if idx < 3:
+		# 		returnStatus["summary"] += sent
 
-		returnStatus["rowNum"] = len(fullSent_list)
-
-		return returnStatus
+		return fullSent_list
 
 	def keywordsIncludeContent(self, contents, keywords):
 		refinedWord = []

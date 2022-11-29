@@ -1,5 +1,6 @@
 body {font-family: 'Apple SD Gothic Neo','Helvetica Neue','Roboto','Noto Sans KR','fontello','Malgun Gothic','Arial', sans-serif !important; font-size: inherit; line-height: inherit }
 
+
 input[type=text]::-ms-clear { display: none !important; } 
 p { margin-bottom:0 !important } 
 em { font-style:normal } 
@@ -11,34 +12,81 @@ a { color:#030303 }
 #wrapper .material-icons { vertical-align: middle } 
 #wrapper textarea:focus { outline: none; } 
 #wrapper .form-control:active, .form-control:focus { border: none; box-shadow: none; } 
-#wrapper .btn { padding:.375rem .5rem; font-weight:normal; border-radius: 3px; border:0; cursor: pointer !important } 
+#wrapper .btn { padding:.375rem .5rem; font-weight:normal; border-radius: 5px; border:0; cursor: pointer !important } 
 #wrapper .btn:active, .btn:focus { border: none; box-shadow: none; } 
+button, input, select { font-family: inherit; font-size: inherit; line-height: inherit; text-transform: none; margin:0; cursor: pointer !important}
+textarea { font-family: inherit; font-size: inherit; line-height: inherit; text-transform: none; margin:0;}
+.form-control {border-radius: 5px }
 
 
 /*테스트 작성*/
 
-#wrapper {width:100%; height:auto; margin-top:50px}
+#wrapper {width:100%; height:100%; margin-top:50px; overflow-y: auto; position: relative}
 
-.edit_wrap {margin:20px auto; width:900px; height:100%; }
+.edit_wrap {margin:20px auto; width:768px; height:100%; position: relative}
+.edit_wrap h2 {font-size: 1rem; font-weight: bold; margin-bottom:15px}
 
 .tit_wrap {border:1px solid #dcdcdc; border-bottom:0}
-.tit_wrap h1 {text-align: center; padding:15px; font-size:18px; line-height:1 !important; font-weight:500; margin-bottom:0; }
+.tit_wrap h1 {text-align: center; padding:15px; font-size:14px; line-height:1 !important; font-weight:500; margin-bottom:0; }
 .tit_wrap h1 span:first-child {color:#af4848;}
 .tit_wrap h1 span:nth-child(2) {color:#1e96ff;}
-.tit_wrap p {font-size: 14px; padding:10px 15px; background: #dcdcdc; border: 1px solid #dcdcdc;
-    border-bottom: 0;}
+.tit_wrap p {font-size: 9px; padding:10px 15px; background: #dcdcdc; 
+	border: 1px solid #dcdcdc;  border-bottom: 0;}
 
 .text_wrap {width:100%; height:400px; padding-top:15px; border:1px solid #dcdcdc; }
 .text_wrap p {padding-left:15px; font-size:12px; }
 
 .btn_wrap {padding:10px 0}
-.btn_wrap .btn {width:85px; height:33px; padding:0 !important; margin-right:5px; font-size:14px; 
+.btn_wrap .btn {width:80px; height:30px; padding:0 !important; margin-right:5px; font-size:10px; 
 	font-weight: 400; background:#dcdcdc; border-radius: 5px;
 	transition: color .01s ease-in-out, background-color .01s ease-in-out;}
 .btn_wrap .btn:hover {background:#ccc; font-weight: 500}
 
 .result_wrap {border:1px solid #dcdcdc; padding:10px 15px 5px}
 .result_wrap p {padding-bottom:5px; font-size:13px}
+
+
+/*api 조회*/
+.top_option  {display: flex; background:#F7F9F9; padding:15px; }
+.top_option div  {display: flex; }
+.top_option > div {margin-right: 15px;}
+.top_option span {display: inline-block; width:auto; line-height:30px; padding-right:10px; font-weight: 500}
+.top_option span::before{ content: "·";  margin-right: 5px;}
+.top_option .form-control {width:100px; height:30px; border-radius: 5px }
+.top_option em {padding:4px 5px}
+.top_option .btn_top {position: absolute; padding-right:25px; right:15px; font-weight:500;  		
+	color:#fff;	border:none; border-radius: 5px; height:30px; 
+	background:#1565C0 url(../img/srch_ico.png) no-repeat calc(100% - 8px) center; 
+	background-size:11px}
+
+.date_input {background: url(../img/date_ico.png) no-repeat center left calc(100% - 7px);}
+
+.log_table {margin-top:10px; widtH:100%; border:1px solid #dcdcdc;}
+.log_table .Htable01 {background:#ebebeb;  }
+.log_table .Htable01 th {padding:2px; font-weight: 500}
+.log_table .index_body tr td {padding:5px 0 5px 10px; white-space: normal; word-break: break-all;text-align: left}
+.log_table .index_body tr td:nth-child(2) {text-align: center; padding:0}
+.log_table .index_body tr td:nth-child(4) {text-align: center; padding:0}
+.Btable03 {height:340px !important }
+
+.btn_down {background: #0288D1 !important; color:#fff !important; }
+.btn_down:hover {background: #0d78b3 !important; font-weight: 400 !important }
+.flex_wrap {display: flex; justify-content: space-between; align-items: center}
+.pagenation a:hover {background:#ebebeb !important; }
+.flex_wrap .form-control {width:50px}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

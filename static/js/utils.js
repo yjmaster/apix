@@ -15,9 +15,8 @@ let Utils = {
 				});
 			},
 			error: function(jqXHR, textStatus, errorThrown){
-				console.error(jqXHR);
-				console.error(textStatus);
-				console.error(errorThrown);
+				callback(jqXHR.responseJSON);
+				$.LoadingOverlay("hide");
 			}
 		}).done(function(res){
 			callback(res);

@@ -5,9 +5,12 @@ import requests
 from flask import request, make_response, jsonify, render_template
 from flask_restx import Resource, Namespace, fields
 
+# text modules
+from textrank_master.summary import TextRank
+
 # ai model
-# from kobart_modules.inference import kobart_inference_API
-# kobart_api = kobart_inference_API()
+from kobart_modules.inference import kobart_inference_API
+kobart_api = kobart_inference_API()
 
 # custom db
 from auth.bflysoft.db import BflysoftDb
@@ -50,63 +53,161 @@ kobart_res = Kobart.model('asia_res', {
 
 @Kobart.route('/title')
 class koBart_title(Resource):
-    @Kobart.doc(parser=kobart_req)
-    @Kobart.response(200, 'API Success/Failure', kobart_res)
-    @Kobart.response(400, 'Failure')
-    @Kobart.response(500, 'Error')
-    def post(self):
-        """
-        제목 생성(kobart) API 입니다.
+	@Kobart.doc(parser=kobart_req)
+	@Kobart.response(200, 'API Success/Failure', kobart_res)
+	@Kobart.response(400, 'Failure')
+	@Kobart.response(500, 'Error')
+	def post(self):
+		"""
+		제목 생성(kobart) API 입니다.
 
-        # Input Arguments 를 JSON 형식으로 전달합니다.
+		# Input Arguments 를 JSON 형식으로 전달합니다.
 
-        **contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
+		**contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
         
-        ## Output Arguments
-        ``` json
-        {
-            "success": true,
-            "extractor": "광복절 집회서 경찰 폭행한 정창옥, 구속 갈림길에 서다"
-        }
-        ```
-        """
-        r = None
-        try:
-            r = {'success': True, 'extractor': []}
-            titles = []
-            args = textFormat.parse_data(request)
-            id_client = args['id_client']
-            contents = args['contents']
-        
-            analyRes = textFormat.contentAnalysis(contents)
-            if analyRes["rowNum"] < 5:
-                r = {"success": False, "message": "5줄 이상 입력해주세요."}
-                return make_response(r)
+		## Output Arguments
+		``` json
+		{
+			"success": true,
+			"extractor": "광복절 집회서 경찰 폭행한 정창옥, 구속 갈림길에 서다"
+		}
+		```
+		"""
+		
+		try:
+			res = None
+			HttpStatus = 200
+			args = textFormat.parse_data(request)
+			router = (request.url_rule.rule).split("/")[-1]
+
+			id_client = args['id_client']
+			content = args['content']
+
+			# 호출 로그를 남겨준다.
+			log_res = log.request_log(id_client, router)
+			etcInfo = {
+				'code': HttpStatus,
+				'uid': log_res['uid'],
+				'router': router,
+				'id_client':id_client
+			}
+
+			# 키 인증을 받는다.
+			res = bflysoftDb.authentication(id_client)
+			if not res['success'] :
+				HttpStatus  = res['code']
+				etcInfo['code'] = HttpStatus
+				log_res.update(res)
+				log_res.update(etcInfo)
+				return
+
+			media = res['media']
+			log_res['media'] = media
+
+			# 데이터 유효성 체크
+			sents = textFormat.contentAnalysis(content)
+			if len(sents) < 5:
+				HttpStatus = 400
+				res = {
+					"success": False,
+					"message": "5문장 이상 입력해주세요.",
+					'code': HttpStatus
+				}
+				log_res.update(res)
+				log_res.update(etcInfo)
+				return
+
+			# log_res.update(etcInfo)
+
+			# title_res = kobart_api.kobart_title(content)
+			# if not title_res['success']:
+
+
+
+			# log_res.update(res)
+
+
+                
+            #     r1 = kobart_api.kobart_title(contents)
+            #     if r1['success'] :
+            #         # print("문장1 : ", r1["extractor"])
+            #         titles.append(r1["extractor"])
+            #         r2 = kobart_api.kobart_title(top3Summary)
+            #         if r2['success']:
+            #             # print("문장2 : ", r2["extractor"])
+            #             titles.append(r2["extractor"])
+            #             if titles[0] == titles[1]:
+            #                 titles = [titles[0]]
+            #             # print("titles : ", titles)
+            #             r['extractor'] = titles
+            #         else: r= r2
+            #     else: r= r1
+
+
+
+
+
+
+            # r = {'success': True, 'extractor': []}
+            # titles = []
+            # top3Summary = ""
+
+			# 
+			# print(args)
+			# print(type(args))
+			# id_client = args['id_client']
+			# 
+
+			# # test_res = {'success': False, 'message': 'fail', 'code': 404}
+			# test_res = {'success': True, 'message': '', 'code': 200}
+
+
+
+
+
+
+
+
+
+			# # 값을 추출해준다.
+
+
+
             
-            isAuth = bflysoftDb.authentication(id_client)
-            if isAuth['success'] :
-                media = isAuth['media']
-                log.wirte_log(media, request)
-                r1 = kobart_api.kobart_title(contents)
-                if r1['success'] :
-                    # print("문장1 : ", r1["extractor"])
-                    titles.append(r1["extractor"])
-                    r2 = kobart_api.kobart_title(analyRes["summary"])
-                    if r2['success']:
-                        # print("문장2 : ", r2["extractor"])
-                        titles.append(r2["extractor"])
-                        if titles[0] == titles[1]:
-                            titles = [titles[0]]
-                        # print("titles : ", titles)
-                        r['extractor'] = titles
-                    else: r= r2
-                else: r= r1
-            else : r = isAuth
+        
 
-        except Exception as exp:
-            r = {"success": False, "message": str(exp)}
-        finally:
-            return make_response(r)
+            
+            # for idx, sent in enumerate(sents):
+                # if idx < 3: top3Summary += sent
+
+            # isAuth = bflysoftDb.authentication(id_client)
+            # if isAuth['success'] :
+            #     media = isAuth['media']
+                
+            #     r1 = kobart_api.kobart_title(contents)
+            #     if r1['success'] :
+            #         # print("문장1 : ", r1["extractor"])
+            #         titles.append(r1["extractor"])
+            #         r2 = kobart_api.kobart_title(top3Summary)
+            #         if r2['success']:
+            #             # print("문장2 : ", r2["extractor"])
+            #             titles.append(r2["extractor"])
+            #             if titles[0] == titles[1]:
+            #                 titles = [titles[0]]
+            #             # print("titles : ", titles)
+            #             r['extractor'] = titles
+            #         else: r= r2
+            #     else: r= r1
+            # else : r = isAuth
+
+		except Exception as exp:
+			res = {"success": False, "message": str(exp)}
+		finally:
+			# 완료 로그를 남겨준다.
+			log.response_log(log_res, args)
+			print("finally log: ", log_res)
+			print("finally: ", res)
+			return make_response(res, HttpStatus)
         
 @Kobart.route('/keyword')
 class KobartKeyword(Resource):
@@ -136,6 +237,7 @@ class KobartKeyword(Resource):
             keywords = []
             keyword1 = []
             keyword2 = []
+            top3Summary = ""
             args = textFormat.parse_data(request)
             id_client = args['id_client']
             title = args['title']
@@ -143,20 +245,23 @@ class KobartKeyword(Resource):
             total_contents = (title + '\n' + contents)
             # print(total_contents)
         
-            analyRes = textFormat.contentAnalysis(total_contents)
-            if analyRes["rowNum"] < 5:
-                r = {"success": False, "message": "5줄 이상 입력해주세요."}
+            sents = textFormat.contentAnalysis(contents)
+            if len(sents) < 5:
+                r = {"success": False, "message": "5문장 이상 입력해주세요."}
                 return make_response(r)
+            
+            for idx, sent in enumerate(sents):
+                if idx < 5: top3Summary += sent
             
             isAuth = bflysoftDb.authentication(id_client)
             if isAuth['success'] :
                 media = isAuth['media']
-                log.wirte_log(media, request)
+                log.request_log(media, request)
                 r1 = kobart_api.kobart_keyword(total_contents)
                 if r1['success'] :
                     keyword1 = r1['extractor'].split("/")
                     # print("keyword1 : ", keyword1)
-                    r2 = kobart_api.kobart_keyword(analyRes["summary"])
+                    r2 = kobart_api.kobart_keyword(top3Summary)
                     if r2['success']:
                         keyword2 = r2['extractor'].split("/")
                         # print("keyword2 : ", keyword2)
@@ -167,6 +272,56 @@ class KobartKeyword(Resource):
                     else: r= r2
                 else: r= r1
             else : r = isAuth
+
+        except Exception as exp:
+            r = {"success": False, "message": str(exp)}
+        finally:
+            return make_response(r)
+        
+@Kobart.route('/subTitle')
+class KobartKeyword(Resource):
+    @Kobart.doc(parser=kobart_req)
+    @Kobart.response(200, 'API Success/Failure', kobart_res)
+    @Kobart.response(400, 'Failure')
+    @Kobart.response(500, 'Error')
+    def post(self):
+        """
+        부제목 생성 (kobart) API 입니다.
+
+        # Input Arguments 를 JSON 형식으로 전달합니다.
+
+        **contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
+        
+        ## Output Arguments
+        ``` json
+        {
+            "success": true,
+            "extractor": ""
+        }
+        ```
+        """
+        r = None
+        try:
+            r = {'success': True, 'extractor': []}
+            subTitles = []
+            args = textFormat.parse_data(request)
+            contents = args['contents']
+
+            sents = textFormat.contentAnalysis(contents)
+            if len(sents) < 5:
+                r = {"success": False, "message": "5문장 이상 입력해주세요."}
+                return make_response(r)
+            
+            textrank = TextRank()
+            subtitles = textrank.summerizer(sents, 4)
+            for sub in subtitles:
+                subRes = kobart_api.kobart_title(sub)
+                if subRes['success']:
+                    subTitles.append(subRes['extractor'])
+                else:
+                    return make_response(subRes)
+            subTitles = list(set(subTitles))
+            r['extractor'] = subTitles
 
         except Exception as exp:
             r = {"success": False, "message": str(exp)}
