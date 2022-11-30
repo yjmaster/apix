@@ -1,8 +1,8 @@
 import uuid
 import pymysql
 class aiLog:
-	# def __init__(self, host='localhost', user='kpf', password='kpf123', db='newsai'):
-	def __init__(self, host='118.67.150.92', user='kpf', password='kpf123', db='newsai'):
+	def __init__(self, host='localhost', user='kpf', password='kpf123', db='newsai'):
+	# def __init__(self, host='118.67.150.92', user='kpf', password='kpf123', db='newsai'):
 		self.host = host
 		self.user = user
 		self.password = password
@@ -40,14 +40,14 @@ class aiLog:
 			curs.execute(_SQL)
 
 		except Exception as exp:
+			res = {"success": False, "code": 500, "message": str(exp)}
 			print("count_log error : {}\n".format(str(exp)))
-			print("query : {}\n".format(_SQL))
-			res = {"success": False, "message": str(exp)}
+			print("query : {}\n".format(_SQL))	
 		finally:
 			self.conn.commit()
 			return res
 
-	def request_log(self, id_client, router):
+	def request_log(self, reqInfo):
 		try:
 			self.connect_db()
 			uid = uuid.uuid1()
@@ -59,25 +59,26 @@ class aiLog:
 					router = '{router}',
 					request_date = NOW()""".format(
 						uid = uid,
-						router = router,
-						id_client = id_client
+						router = reqInfo['router'],
+						id_client = reqInfo['id_client']
 					)
 
 			# print("호출 로그 ----------> \n", _SQL)
 
 			curs = self.conn.cursor()
 			curs.execute(_SQL)
-
+			# raise Exception('request_log test error')
 		except Exception as exp:
+			res = {"success": False, "uid": uid, "code": 500, "message": str(exp)}
 			print("request_log error : {}\n".format(str(exp)))
-			print("query : {}\n".format(_SQL))
-			res = {"success": False, "message": str(exp)}
+			print("request_log query : {}\n".format(_SQL))
 		finally:
 			self.conn.commit()
 			return res
 
 	def response_log(self, resInfo, params):
 		try:
+			self.connect_db()
 			res = {"success": True}
 
 			uid = resInfo['uid']
@@ -90,7 +91,7 @@ class aiLog:
 
 			message_sql = ""
 			if "message" in resInfo:
-				message = resInfo['message']
+				message = self.conn.escape_string(resInfo['message'])
 				message_sql = "error_msg = '{}' ,".format(message)
 
 			_SQL = """UPDATE news_ai_log SET
@@ -111,19 +112,17 @@ class aiLog:
 			curs = self.conn.cursor()
 			curs.execute(_SQL)
 
-			# if not resInfo['success'] and code != 401:
-			# 	print("추가파라미터저장")
-			# 	params.update({'uid': uid})
-			# 	res = self.error_data_log(params)
-			# 	if not res['success']: return
+			if not resInfo['success'] and code != 500 and code != 401 and code != 403:
+				params.update({'uid': uid})
+				self.error_data_log(params)
     
 			if resInfo['success'] and code == 200:
-				self.count_log(resInfo)
+				res = self.count_log(resInfo)
 
 		except Exception as exp:
+			res = {"success": False, "code": 500, "message": str(exp)}
 			print("response_log error : {}\n".format(str(exp)))
 			print("query : {}\n".format(_SQL))
-			res = {"success": False, "message": str(exp)}
 		finally:
 			self.conn.commit()
 			self.conn.cursor().close()
@@ -134,14 +133,21 @@ class aiLog:
 		try:
 			res = {"success": True}
 
+			summary_sql = ""
+			if "summary" in params:
+				summary = self.conn.escape_string(params['summary'])
+				summary_sql = "summary = '{}' ,".format(summary)
+
 			_SQL = """INSERT INTO error_data
 				SET `uid` = '{uid}',
 					title = '{title}',
 					content = '{content}',
+					{summary_sql}
 					request_date = NOW()""".format(
 						uid = params['uid'],
-						title = self.conn.escape_string(params['title']),
-						content = self.conn.escape_string(params['content'])
+						title = params['title'],
+						content = params['content'],
+						summary_sql = summary_sql
 					)
 
 			# print("데이터 로그 ----------> \n", _SQL)
@@ -150,9 +156,9 @@ class aiLog:
 			curs.execute(_SQL)
 
 		except Exception as exp:
+			res = {"success": False, "message": str(exp)}
 			print("error_data_log error : {}\n".format(str(exp)))
 			print("query : {}\n".format(_SQL))
-			res = {"success": False, "message": str(exp)}
 		finally:
 			self.conn.commit()
 			return res

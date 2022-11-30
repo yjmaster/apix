@@ -50,9 +50,9 @@ class BflysoftDb:
 
 			res['success'] = True
 			res['media'] = NM_CLIENT
-
+			# raise Exception('authentication test error')
 		except Exception as exp :
-			res = {"success": False, "message": str(exp)}
+			res = {"success": False, "code": 500, "message": str(exp)}
 		finally:
 			self.conn.cursor().close()
 			self.conn.close()
