@@ -159,79 +159,125 @@ class koBart_title(Resource):
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
 
-			# print("logInfo : ", logInfo)
-			# print("finally: ", res)
+			print("------------------------------------")
+			print("logInfo : ", logInfo)
+			print("finally: ", res)
+			print("------------------------------------")
 			return make_response(res, logInfo['code'])
         
 @Kobart.route('/keyword')
 class KobartKeyword(Resource):
-    @Kobart.doc(parser=kobart_req)
-    @Kobart.response(200, 'API Success/Failure', kobart_res)
-    @Kobart.response(400, 'Failure')
-    @Kobart.response(500, 'Error')
-    def post(self):
-        """
-        키워드 생성 (kobart) API 입니다.
+	@Kobart.doc(parser=kobart_req)
+	@Kobart.response(200, 'API Success/Failure', kobart_res)
+	@Kobart.response(400, 'Failure')
+	@Kobart.response(500, 'Error')
+	def post(self):
+		"""
+		키워드 생성 (kobart) API 입니다.
 
-        # Input Arguments 를 JSON 형식으로 전달합니다.
+		# Input Arguments 를 JSON 형식으로 전달합니다.
 
-        **contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
-        
-        ## Output Arguments
-        ``` json
-        {
-            "success": true,
-            "extractor": "광복절/집회방해/구속"
-        }
-        ```
-        """
-        r = None
-        try:
-            r = {'success': True, 'extractor': []}
-            keywords = []
-            keyword1 = []
-            keyword2 = []
-            top3Summary = ""
-            args = textFormat.parse_data(request)
-            id_client = args['id_client']
-            title = args['title']
-            contents = args['contents']
-            total_contents = (title + '\n' + contents)
-            # print(total_contents)
-        
-            sents = textFormat.contentAnalysis(contents)
-            if len(sents) < 5:
-                r = {"success": False, "message": "5문장 이상 입력해주세요."}
-                return make_response(r)
-            
-            for idx, sent in enumerate(sents):
-                if idx < 5: top3Summary += sent
-            
-            isAuth = bflysoftDb.authentication(id_client)
-            if isAuth['success'] :
-                media = isAuth['media']
-                log.request_log(media, request)
-                r1 = kobart_api.kobart_keyword(total_contents)
-                if r1['success'] :
-                    keyword1 = r1['extractor'].split("/")
-                    # print("keyword1 : ", keyword1)
-                    r2 = kobart_api.kobart_keyword(top3Summary)
-                    if r2['success']:
-                        keyword2 = r2['extractor'].split("/")
-                        # print("keyword2 : ", keyword2)
-                        keywords = (keyword1 + keyword2)
-                        keywords = customWord.countryNameParsing(total_contents, keywords)
-                        keywords = textFormat.keywordsIncludeContent(total_contents, keywords)
-                        r['extractor'] = keywords
-                    else: r= r2
-                else: r= r1
-            else : r = isAuth
+		**contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
 
-        except Exception as exp:
-            r = {"success": False, "message": str(exp)}
-        finally:
-            return make_response(r)
-        
+		## Output Arguments
+		``` json
+		{
+			"success": true,
+			"extractor": "광복절/집회방해/구속"
+		}
+		```
+		"""
+		try:
+			res =  {}
+			args = textFormat.parse_data(request)
+			router = (request.url_rule.rule).split("/")[-1]
+
+			id_client = args['id_client']
+			title = args['title']
+			content = args['content']
+
+			logInfo = {
+				'code': 200,
+				'router': router,
+				'id_client': id_client
+			}
+
+			# 호출 로그를 남겨준다.
+			res = log.request_log(logInfo)
+			logInfo.update(res)
+			if not logInfo['success']: return
+
+			# 키 인증을 받는다.
+			res = bflysoftDb.authentication(id_client)
+			logInfo.update(res)
+			if not res['success']: return
+
+			# 데이터 유효성 체크
+			top3Summary = ""
+			sents = textFormat.contentAnalysis(content)
+			# sents = ['test1','test2','test3','test4','test5']
+			if len(sents) < 5:
+				logInfo.update({
+					"success": False,
+					"message": "5문장 이상 입력해주세요.",
+					'code': 400
+				})
+				res = logInfo
+				return
+
+			for idx, sent in enumerate(sents):
+				if idx < 3: top3Summary += sent
+
+			args['summary'] = top3Summary
+                
+			# 키워드 추출
+			keywords = []
+			total_contents = (title + '\n' + content)
+			keyword1 = kobart_api.kobart_keyword(total_contents)
+			# keyword1 = {"success": False, "code": 400, "message": "키워드추출에러1"}
+			# keyword1 = {"success": True, "extractor": "키워드1/키워드2/키워드3"}
+			if not keyword1['success']:
+				logInfo.update(keyword1)
+				res = logInfo
+				return
+
+			keyword2 = kobart_api.kobart_keyword(top3Summary)
+			# keyword2 = {"success": False, "code": 400, "message": "키워드추출에러2"}
+			# keyword2 = {"success": True, "extractor": "키워드4/키워드5/키워드6"}
+			if not keyword2['success']:
+				args['summary'] = top3Summary
+				logInfo.update(keyword2)
+				res = logInfo
+				return
+
+			k1 = keyword1["extractor"]
+			k2 = keyword2["extractor"]
+
+			keywords = (k1 + k2)
+			keywords = customWord.countryNameParsing(total_contents, keywords)
+			keywords = textFormat.keywordsIncludeContent(total_contents, keywords)
+
+			logInfo["extractor"] = keywords
+			res = logInfo
+
+			# raise Exception('kobart keyword test error')
+		except Exception as exp:
+			res = {"success": False, "code": 400, "message": str(exp)}
+			logInfo.update(res)
+		finally:
+			# 완료 로그를 남겨준다.
+			complete_res = log.response_log(logInfo, args)
+			if not complete_res['success']:
+				res = complete_res
+				logInfo.update(complete_res)
+				log.response_log(logInfo, args)
+
+			print("------------------------------------")
+			print("logInfo : ", logInfo)
+			print("finally: ", res)
+			print("------------------------------------")
+			return make_response(res, logInfo['code'])
+
 @Kobart.route('/subTitle')
 class KobartKeyword(Resource):
     @Kobart.doc(parser=kobart_req)
