@@ -312,7 +312,8 @@ class KobartKeyword(Resource):
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client
+				'id_client': id_client,
+				'media': 'tester'
 			}
 
 			# 호출 로그를 남겨준다.

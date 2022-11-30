@@ -84,24 +84,19 @@ class aiLog:
 			uid = resInfo['uid']
 			code = resInfo['code']
 
-			media_sql = ""
-			if "media" in resInfo:
-				media = resInfo['media']
-				media_sql = "media = '{}' ,".format(media)
-
 			message_sql = ""
 			if "message" in resInfo:
 				message = self.conn.escape_string(resInfo['message'])
 				message_sql = "error_msg = '{}' ,".format(message)
 
 			_SQL = """UPDATE news_ai_log SET
-					{media_sql}
+					media = '{media}',
 					{message_sql}
 					response_date = NOW(),
 					response_code = '{code}'
 				WHERE 1=1
 				AND `uid` = '{uid}'""".format(
-						media_sql = media_sql,
+						media = resInfo['media'],
 						message_sql = message_sql,
 						code = code,
 						uid = uid
