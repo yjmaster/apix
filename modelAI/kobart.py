@@ -250,8 +250,8 @@ class KobartKeyword(Resource):
 				res = logInfo
 				return
 
-			k1 = keyword1["extractor"]
-			k2 = keyword2["extractor"]
+			k1 = keyword1["extractor"].split("/")
+			k2 = keyword2["extractor"].split("/")
 
 			keywords = (k1 + k2)
 			keywords = customWord.countryNameParsing(total_contents, keywords)
@@ -280,50 +280,92 @@ class KobartKeyword(Resource):
 
 @Kobart.route('/subTitle')
 class KobartKeyword(Resource):
-    @Kobart.doc(parser=kobart_req)
-    @Kobart.response(200, 'API Success/Failure', kobart_res)
-    @Kobart.response(400, 'Failure')
-    @Kobart.response(500, 'Error')
-    def post(self):
-        """
-        부제목 생성 (kobart) API 입니다.
+	@Kobart.doc(parser=kobart_req)
+	@Kobart.response(200, 'API Success/Failure', kobart_res)
+	@Kobart.response(400, 'Failure')
+	@Kobart.response(500, 'Error')
+	def post(self):
+		"""
+		부제목 생성 (kobart) API 입니다.
 
-        # Input Arguments 를 JSON 형식으로 전달합니다.
+		# Input Arguments 를 JSON 형식으로 전달합니다.
 
-        **contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
-        
-        ## Output Arguments
-        ``` json
-        {
-            "success": true,
-            "extractor": ""
-        }
-        ```
-        """
-        r = None
-        try:
-            r = {'success': True, 'extractor': []}
-            subTitles = []
-            args = textFormat.parse_data(request)
-            contents = args['contents']
+		**contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
 
-            sents = textFormat.contentAnalysis(contents)
-            if len(sents) < 5:
-                r = {"success": False, "message": "5문장 이상 입력해주세요."}
-                return make_response(r)
-            
-            textrank = TextRank()
-            subtitles = textrank.summerizer(sents, 4)
-            for sub in subtitles:
-                subRes = kobart_api.kobart_title(sub)
-                if subRes['success']:
-                    subTitles.append(subRes['extractor'])
-                else:
-                    return make_response(subRes)
-            subTitles = list(set(subTitles))
-            r['extractor'] = subTitles
+		## Output Arguments
+		``` json
+		{
+			"success": true,
+			"extractor": ""
+		}
+		```
+		"""
+		try:
+			res =  {}
+			args = textFormat.parse_data(request)
+			router = (request.url_rule.rule).split("/")[-1]
 
-        except Exception as exp:
-            r = {"success": False, "message": str(exp)}
-        finally:
-            return make_response(r)
+			id_client = args['id_client']
+			title = args['title']
+			content = args['content']
+
+			logInfo = {
+				'code': 200,
+				'router': router,
+				'id_client': id_client
+			}
+
+			# 호출 로그를 남겨준다.
+			res = log.request_log(logInfo)
+			logInfo.update(res)
+			if not logInfo['success']: return
+
+			# 데이터 유효성 체크
+			sents = textFormat.contentAnalysis(content)
+			# sents = ['test1','test2','test3','test4','test5']
+			if len(sents) < 5:
+				logInfo.update({
+					"success": False,
+					"message": "5문장 이상 입력해주세요.",
+					'code': 400
+				})
+				res = logInfo
+				return
+
+			# 부제목 추출
+			subTitles = []
+			textrank = TextRank()
+			summary = textrank.summerizer(sents, 4)
+			# summary = ["요약문장입니다1","요약문장입니다2","요약문장입니다3","요약문장입니다4"]
+			for summ in summary:
+				# title = {"success": False, "code": 400, "message": "부제목추출에러2"}
+				# title = {"success": True, "extractor": "부제목추출"}
+				title = kobart_api.kobart_title(summ)
+				if not title['success']:
+					args['summary'] = summ
+					logInfo.update(title)
+					res = logInfo
+					return
+				subTitles.append(title['extractor'])
+
+			subTitles = list(set(subTitles))
+			logInfo['extractor'] = subTitles
+			res = logInfo
+
+			# raise Exception('kobart subtitle test error')
+		except Exception as exp:
+			res = {"success": False, "code": 400, "message": str(exp)}
+			logInfo.update(res)
+		finally:
+			# 완료 로그를 남겨준다.
+			complete_res = log.response_log(logInfo, args)
+			if not complete_res['success']:
+				res = complete_res
+				logInfo.update(complete_res)
+				log.response_log(logInfo, args)
+
+			print("------------------------------------")
+			print("logInfo : ", logInfo)
+			print("finally: ", res)
+			print("------------------------------------")
+			return make_response(res, logInfo['code'])
