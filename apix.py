@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, url_for, render_template
 from flask_restx import Resource, Api, apidoc
 from flask_cors import CORS, cross_origin
 
+from controller import kobart_v1
 from controller import yjmedia
 from controller import kpf
 
@@ -45,6 +46,7 @@ api = Api(
     license="MIT"
 )
 
+app.register_blueprint(kobart_v1, url_prefix='/kobart_v1')
 app.register_blueprint(yjmedia, url_prefix='/')
 app.register_blueprint(kpf, url_prefix='/kpf')
 
@@ -56,7 +58,6 @@ app.register_blueprint(kpf, url_prefix='/kpf')
 #         return redirect(url_for('yjmedia.login'))
 #     else :
 #         return apidoc.ui_for(api)
-    
 
 api.add_namespace(Todo, '/todo')
 api.add_namespace(Auth, '/auth')
