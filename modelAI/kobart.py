@@ -164,7 +164,7 @@ class koBart_title(Resource):
 			print("finally: ", res)
 			print("------------------------------------")
 			return make_response(res, logInfo['code'])
-        
+
 @Kobart.route('/keyword')
 class KobartKeyword(Resource):
 	@Kobart.doc(parser=kobart_req)
@@ -370,3 +370,86 @@ class KobartKeyword(Resource):
 			print("finally: ", res)
 			print("------------------------------------")
 			return make_response(res, logInfo['code'])
+
+@Kobart.route('/oneLine')
+class koBart_title(Resource):
+	@Kobart.doc(parser=kobart_req)
+	@Kobart.response(200, 'API Success/Failure', kobart_res)
+	@Kobart.response(400, 'Failure')
+	@Kobart.response(500, 'Error')
+	def post(self):
+		"""
+		한줄 요약 (kobart) API 입니다.
+
+		# Input Arguments 를 JSON 형식으로 전달합니다.
+
+		**contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
+        
+		## Output Arguments
+		``` json
+		{
+			"success": true,
+			"extractor": "광복절 집회서 경찰 폭행한 정창옥, 구속 갈림길에 서다"
+		}
+		```
+		"""
+		
+		try:
+			res =  {}
+			args = textFormat.parse_data(request)
+			router = (request.url_rule.rule).split("/")[-1]
+
+			id_client = args['id_client']
+			content = args['content']
+
+			logInfo = {
+				'code': 200,
+				'router': router,
+				'id_client': id_client,
+				'media': 'tester'
+			}
+
+			# 호출 로그를 남겨준다.
+			res = log.request_log(logInfo)
+			logInfo.update(res)
+			if not logInfo['success']: return
+
+			# 데이터 유효성 체크
+			sents = textFormat.contentAnalysis(content)
+			if len(sents) < 5:
+				logInfo.update({
+					"success": False,
+					"message": "5문장 이상 입력해주세요.",
+					'code': 400
+				})
+				res = logInfo
+				return
+
+			# 한줄 요약 추출
+			oneLine = kobart_api.kobart_summary_short(content)
+			if not oneLine['success']:
+				logInfo.update(oneLine)
+				res = logInfo
+				return
+			
+			oneLineTxt = oneLine["extractor"]
+			logInfo["extractor"] = oneLineTxt
+			res = logInfo
+			# raise Exception('kobart oneLine test error')
+		except Exception as exp:
+			res = {"success": False, "code": 400, "message": str(exp)}
+			logInfo.update(res)
+		finally:
+			# 완료 로그를 남겨준다.
+			complete_res = log.response_log(logInfo, args)
+			if not complete_res['success']:
+				res = complete_res
+				logInfo.update(complete_res)
+				log.response_log(logInfo, args)
+
+			print("------------------------------------")
+			print("logInfo : ", logInfo)
+			print("finally: ", res)
+			print("------------------------------------")
+			return make_response(res, logInfo['code'])
+

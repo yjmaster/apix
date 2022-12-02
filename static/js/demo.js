@@ -69,6 +69,8 @@ $(document).ready(function(){
                             finalText += `${word}, `;
                         }
                         finalText = finalText.slice(0, -2);
+                    }else{
+                        finalText = resText;
                     }
                     finalText = finalText.trim();
                     $("#textResult").val(finalText);
