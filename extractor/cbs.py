@@ -4,10 +4,10 @@ from flask import request, make_response
 from flask_restx import Resource, Namespace, fields
 
 # custom modules
-from utils.aiLog import aiLog
+from utils.aiLog2 import aiLog2
 from utils.reqFormat import reqFormat
 
-log = aiLog()
+log = aiLog2()
 
 # ai modules
 from yj_kogpt2_API.inference2 import kogpt2_inference_API

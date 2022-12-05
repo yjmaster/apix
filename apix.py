@@ -14,7 +14,7 @@ userDb = UserDb()
 from todo.todo import Todo 
 
 ### kobart ###
-from modelAI.kobart import Kobart
+from serviceAI.kobart import Kobart
 
 ### GPT API ###
 from extractor.extractor import Extractor
@@ -60,7 +60,7 @@ def custom_ui():
 
 api.add_namespace(Todo, '/todo')
 api.add_namespace(Auth, '/auth')
-api.add_namespace(Kobart, '/kobart')
+api.add_namespace(Kobart, '/v1')
 api.add_namespace(CBS, '/cbs')
 api.add_namespace(AsiaTimes, '/asiatimes')
 

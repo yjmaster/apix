@@ -6,10 +6,10 @@ from flask import request, make_response
 from flask_restx import Resource, Api, Namespace, fields
 
 # custom modules
-from utils.aiLog import aiLog
+from utils.aiLog2 import aiLog2
 from utils.reqFormat import reqFormat
 
-log = aiLog()
+log = aiLog2()
 
 from konke.model.unsupervised.statistical.tfidf import TfIdf
 

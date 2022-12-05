@@ -1,15 +1,13 @@
+import uuid
 import pymysql
-from datetime import datetime
-from utils.reqFormat import reqFormat
-
 class aiLog:
-	def __init__(self, host='192.168.0.190', user='maria', password='maria123', db='maria_DB'):
+	def __init__(self, host='192.168.0.190', user='maria', password='maria123', db='newsai'):
 		self.host = host
 		self.user = user
 		self.password = password
 		self.db = db
 
-	def DB_CONNECT(self):
+	def connect_db(self):
 		self.conn = pymysql.connect(host=self.host, user=self.user, password=self.password, db=self.db, charset='utf8')
 		self.conn.query("set character_set_connection=utf8;")
 		self.conn.query("set character_set_server=utf8;")
@@ -17,51 +15,187 @@ class aiLog:
 		self.conn.query("set character_set_results=utf8;")
 		self.conn.query("set character_set_database=utf8;")
 
-	def DB_UPDATE(self, media, router, userInfo):
+	def count_log(self, cntInfo):
 		try:
-			# userInfo 는 필수값이 될 예정
-			if bool(userInfo) == False :
-				userInfo['user_login'] = media
-				userInfo['user_name'] = media
-    
-			_SQL = """INSERT INTO news_ai_log SET
-					router = '{router}',
+			res = {"success": True}
+
+			_SQL = """INSERT INTO news_ai_cnt SET
 					media = '{media}',
-					user_login = '{user_login}',
-					`user_name` = '{user_name}',
-					last_date = NOW(),
-					cnt = 1
+					router = '{router}',
+					id_client = '{id_client}',
+					cnt = 1,
+					last_date = NOW()
 				ON DUPLICATE KEY UPDATE
 					cnt = cnt + 1,
-					last_date = NOW(),
-					user_login = '{user_login}',
-					`user_name` = '{user_name}'""".format(
-						router = router,
-						media = media,
-						user_login = userInfo['user_login'],
-						user_name = userInfo['user_name']
+					last_date = NOW()""".format(
+						media = cntInfo['media'],
+						router = cntInfo['router'],
+						id_client = cntInfo['id_client']
 					)
 
-			#print(_SQL)
+			# print("카운팅 로그 ----------> \n", _SQL)
 
 			curs = self.conn.cursor()
 			curs.execute(_SQL)
-		
-		except Exception as e :
-			print("ERROR : {}".format(e))
-			pass
-		else:
+
+		except Exception as exp:
+			res = {"success": False, "code": 500, "message": str(exp)}
+			print("count_log error : {}\n".format(str(exp)))
+			print("query : {}\n".format(_SQL))	
+		finally:
 			self.conn.commit()
+			return res
+
+	def request_log(self, reqInfo):
+		try:
+			self.connect_db()
+			uid = uuid.uuid1()
+			res = {"success": True, "uid": uid}
+
+			_SQL = """INSERT INTO news_ai_log SET
+					`uid` = '{uid}',
+					id_client = '{id_client}',
+					router = '{router}',
+					request_date = NOW()""".format(
+						uid = uid,
+						router = reqInfo['router'],
+						id_client = reqInfo['id_client']
+					)
+
+			# print("호출 로그 ----------> \n", _SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+			# raise Exception('request_log test error')
+		except Exception as exp:
+			res = {"success": False, "uid": uid, "code": 500, "message": str(exp)}
+			print("request_log error : {}\n".format(str(exp)))
+			print("request_log query : {}\n".format(_SQL))
+		finally:
+			self.conn.commit()
+			return res
+
+	def response_log(self, resInfo, params):
+		try:
+			self.connect_db()
+			res = {"success": True}
+
+			uid = resInfo['uid']
+			code = resInfo['code']
+
+			message_sql = ""
+			if "message" in resInfo:
+				message = self.conn.escape_string(resInfo['message'])
+				message_sql = "error_msg = '{}' ,".format(message)
+
+			_SQL = """UPDATE news_ai_log SET
+					media = '{media}',
+					{message_sql}
+					response_date = NOW(),
+					response_code = '{code}'
+				WHERE 1=1
+				AND `uid` = '{uid}'""".format(
+						media = resInfo['media'],
+						message_sql = message_sql,
+						code = code,
+						uid = uid
+					)
+
+			# print("완료 로그 ----------> \n", _SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+
+			if not resInfo['success'] and code != 500 and code != 401 and code != 403:
+				params.update({'uid': uid})
+				self.error_data_log(params)
+    
+			if resInfo['success'] and code == 200:
+				res = self.count_log(resInfo)
+
+		except Exception as exp:
+			res = {"success": False, "code": 500, "message": str(exp)}
+			print("response_log error : {}\n".format(str(exp)))
+			print("query : {}\n".format(_SQL))
+		finally:
+			self.conn.commit()
+			self.conn.cursor().close()
 			self.conn.close()
-			curs.close()
+			return res
 
-	def wirte_log(self, media, request):	
-		userInfo = {}
-		router = (request.url_rule.rule).split("/")[-1]
-		args = reqFormat.parse_data(request)
-		if ('userLogin' in args) and ('userName' in args):
-			userInfo['user_login'] = args['userLogin']
-			userInfo['user_name'] = args['userName']
+	def error_data_log(self, params):
+		try:
+			res = {"success": True}
 
-		self.DB_CONNECT()
-		self.DB_UPDATE(media, router, userInfo)
+			summary_sql = ""
+			if "summary" in params:
+				summary = self.conn.escape_string(params['summary'])
+				summary_sql = "summary = '{}' ,".format(summary)
+
+			_SQL = """INSERT INTO error_data
+				SET `uid` = '{uid}',
+					title = '{title}',
+					content = '{content}',
+					{summary_sql}
+					request_date = NOW()""".format(
+						uid = params['uid'],
+						title = params['title'],
+						content = params['content'],
+						summary_sql = summary_sql
+					)
+
+			# print("데이터 로그 ----------> \n", _SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+
+		except Exception as exp:
+			res = {"success": False, "message": str(exp)}
+			print("error_data_log error : {}\n".format(str(exp)))
+			print("query : {}\n".format(_SQL))
+		finally:
+			self.conn.commit()
+			return res
+
+	def authentication(self, id_client):
+		try:
+			self.connect_db()
+			res = {'success': False}
+			
+			_SQL = """SELECT
+					NM_CLIENT,
+					FG_NEWSAI_USE
+				FROM api_client
+				WHERE 1=1
+				AND ID_CLIENT = '{ID_CLIENT}'""".format(
+					ID_CLIENT = id_client
+				)
+
+			# print(_SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+
+			isUser = curs.fetchone()
+			if not isUser :
+				res['message'] = '존재하지 않는 사용자 입니다.'
+				res['code'] = 401
+				return
+
+			NM_CLIENT = isUser[0]
+			FG_NEWSAI_USE = isUser[1]
+
+			if FG_NEWSAI_USE == 'N':
+				res['message'] = 'NEWS AI 사용 등록이 되지 않았습니다.'
+				res['code'] = 403
+				return
+
+			res['success'] = True
+			res['media'] = NM_CLIENT
+			# raise Exception('authentication test error')
+		except Exception as exp :
+			res = {"success": False, "code": 500, "message": str(exp)}
+		finally:
+			self.conn.cursor().close()
+			self.conn.close()
+			return res

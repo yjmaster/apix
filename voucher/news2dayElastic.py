@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Resource, Namespace, fields
 from voucher.database.news2day.news2dayElastic import News2dayElastic
 from voucher.util import Util
-from utils.aiLog import aiLog
+from utils.aiLog2 import aiLog2
 
 NEWS2DAY_ELASTIC = Namespace(
     name="ESG",
@@ -11,7 +11,7 @@ NEWS2DAY_ELASTIC = Namespace(
 
 news2dayElastic = News2dayElastic()
 util = Util()
-log = aiLog()
+log = aiLog2()
 
 # request model
 req_model = NEWS2DAY_ELASTIC.model('NEWS2DAY_Model',{
