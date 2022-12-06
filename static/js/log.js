@@ -1,21 +1,101 @@
-$(document).ready(function(){
-    let log = {
-        init: function(){
-            let browser = $(window).height();
-            let wraper = $("#wraper").height();
-            let top = (browser - wraper) / 2;
+let log = {
+    params: {
+        sdate: '',
+        edate: '',
+        page: 1,
+        display: 10,
+        media: '',
+        code: ''
+    },
+    init: function(){
+        let browser = $(window).height();
+        let wraper = $("#wraper").height();
+        let top = (browser - wraper) / 2;
+        $("#wraper").css("margin-top", `${top}px`);
+    
+        log.setDatePicker();
+        log.getLog();
+    },
+    setDatePicker: function(){
+        let edate = new Date().format();
+        let sdate = new Date(edate)['getMonths'](-1);  
+    
+        let range_date = $("#dateRange").datepicker(
+            {type : "range", minDate : new Date().getMonths(-1), maxDate : edate});
+    
+        range_date.datepicker('setDateRange',  sdate, edate);
+    },
+    getLog: function(){
+        let html = "";
+        let dateRange = $("#dateRange").val();
+        let fullDate = dateRange.split(" ~ ");
+        log.params["sdate"] = fullDate[0];
+        log.params["edate"] = fullDate[1];
         
-            $("#wraper").css("margin-top", `${top}px`);
-        
-            let edate = new Date().format();
-            let sdate = new Date(edate)['getMonths'](-1);  
-        
-            let range_date = $("#dateRange").datepicker(
-                {type : "range", minDate : new Date().getMonths(-1), maxDate : edate});
-        
-            range_date.datepicker('setDateRange',  sdate, edate);
+        let sendData = JSON.stringify(log.params);
+        Utils.call('POST', `/log`, sendData, function(res){
+            console.log(res)
+            if(res.success){
+                for (let [idx, row] of res['list'].entries()) {
+                    let request_date = row['request_date'];
+                    request_date = request_date.replaceAll(' ', '<br/>');
+                    
+                    let message = (ObjectUtils.isNotEmpty(
+                        row['error_msg'])? row['error_msg'] : "");
 
+                    let response_date = row['response_date'];
+                    response_date = response_date.replaceAll(' ', '<br/>');
+
+                    html += `<tr>\n`;
+                    html += `   <td>${row['uid']}</td>\n`;
+                    html += `   <td>${row['media']}</td>\n`;
+                    html += `   <td class="date">${request_date}</td>\n`;
+                    html += `   <td>${row['response_code']}</td>\n`;
+                    html += `   <td>${message}</td>\n`;
+                    html += `   <td class="date">${response_date}</td>\n`;
+                    html += `</tr>\n`;
+                }
+                $("#totalCnt").text(res.cnt);
+
+                let lastPage = res.last_page;
+                let currentPage = log.params["page"];
+                log.pagination(currentPage, lastPage);
+            }else{
+                alert(res.message);
+            }
+            $("#log_list").html(html);
+        });
+    },
+    changePage: function(page){
+        log.params['page'] = page
+        log.getLog();
+    },
+    pagination: function(currentPage, lastPage){
+        let html = ""; 
+        let pagePerBlock = 5;
+
+        let pageGroup = Math.ceil(currentPage / pagePerBlock) - 1;
+        let start = (pageGroup * pagePerBlock) + 1;
+        let last = (pageGroup + 1) * pagePerBlock;
+
+        // 전 페이지 블록으로
+        if(start > pagePerBlock){
+            html += `<a onclick='log.changePage(${start-pagePerBlock})' class="navi">이전</a>\n`;
         }
+        // 중간 페이지
+        for(let i=start; i <= last; i++){
+            if(i > lastPage) break;
+            if(i == currentPage) {
+                html += `<a onclick='log.changePage(${i})' class='active'>${i}</a>\n`;
+            }else{
+                html += `<a onclick='log.changePage(${i})'>${i}</a>\n`;
+            }
+        }
+        // 다음 페이지 블록으로
+        if(currentPage + pagePerBlock <= lastPage){
+            html += `<a onclick='log.changePage(${last+1})' class="navi">다음</a>\n`;
+        }
+        $(".pagenation").html(html);
     }
-    log.init();
-});
+}
+

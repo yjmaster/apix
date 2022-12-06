@@ -72,7 +72,7 @@ textarea { font-family: inherit; font-size: inherit; line-height: inherit; text-
 .btn_down {background: #0288D1 !important; color:#fff !important; }
 .btn_down:hover {background: #0d78b3 !important; font-weight: 400 !important }
 .flex_wrap {display: flex; justify-content: space-between; align-items: center}
-.pagenation a:hover {background:#ebebeb !important; }
+.pagenation a:hover:not(.active) {background:#ebebeb !important; }
 .flex_wrap .form-control {width:50px}
 
 

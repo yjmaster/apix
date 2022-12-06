@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/my.css') }}"/>
 	<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
 	<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/comMon.js') }}"></script>
     <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
@@ -23,6 +24,11 @@
     <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/object_utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/log.js') }}"></script>
+	<script>
+		$(document).ready(function(){
+			log.init();
+		});
+	</script>
 </head>
 
 <body>
@@ -96,80 +102,7 @@
 							<col style="width: *">
 							<col style="width: 12%">
 						</colgroup>
-						<tbody>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-							<tr>
-								<td>123 1f32as4df5a4f23sd1af581324f8as1f34 </td>
-								<td>전북일보</td>
-								<td>2022-06-26<br/>17:52:15</td>
-								<td>900</td>
-								<td>정의되지않은 오류가 발생하였씁니다. 관리자에게 문의해 주시기 바랍니다.</td>
-								<td>2022-06-26<br/>17:52:15</td>
-							</tr>
-						</tbody>
+						<tbody id="log_list"></tbody>
 					</table>
 				</div>
 			</div>
@@ -179,16 +112,8 @@
 			</div>
 			<!--하단랩-->
 			<div class="flex_wrap">
-				<div><strong>Total : <span>3</span></strong></div>
-				<div class="pagenation">
-					<a href="#" class="navi">이전</a>
-					<a href="#" class="active">1</a>
-					<a href="#">2</a>
-					<a href="#">3</a>
-					<a href="#">4</a>
-					<a href="#">5</a>
-					<a href="#" class="navi">다음</a>
-				</div>
+				<div><strong>Total : <span id="totalCnt">0</span></strong></div>
+				<div class="pagenation"></div>
 				<div>
 					<select class="form-control">
 						<option>10</option>
