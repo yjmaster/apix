@@ -21,11 +21,25 @@ class KpfDb:
 		try:
 			result = {"success": True}
 
+			_MEDIA = ""
+			media = params['media']
+			if media != '':
+				_MEDIA = "AND media = '{}'".format(params['media'])
+    
+			_CODE = ""
+			code = params['code']
+			if code != '':
+				_CODE = "AND response_code = '{}'".format(params['code'])
+
 			_SQL = """SELECT count(*)
 				FROM news_ai_log
 				WHERE 1=1
+				{_MEDIA}
+				{_CODE}
 				AND request_date >= '{sdate} 00:00:00'
 				AND request_date <= '{edate} 23:59:59'""".format(
+					_MEDIA = _MEDIA,
+					_CODE = _CODE,
 					sdate = params['sdate'],
 					edate = params['edate']
 				)
@@ -39,7 +53,7 @@ class KpfDb:
 			cnt = int(total[0])
 			display = int(params['display'])
 
-			last_page = math.floor(cnt/display)
+			last_page = math.ceil(cnt/display)
 
 			result['cnt'] = cnt
 			result['last_page'] = last_page
@@ -49,11 +63,55 @@ class KpfDb:
 		finally:
 			return result
 
-	def select(self, params):
+	def get_options(self, params):
 		try:
+			self.connect_db()
+			result = {"success": True}
+    
+			_SQL = """SELECT
+				DISTINCT media, response_code
+				FROM news_ai_log
+				WHERE 1=1
+				AND request_date >= '{sdate} 00:00:00'
+				AND request_date <= '{edate} 23:59:59'
+				ORDER BY request_date DESC""".format(
+					sdate = params['sdate'],
+					edate = params['edate']
+				)
+
+			# print(_SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+
+			options, media, code = {}, [], []
+			for idx, row in enumerate(curs) :
+				mediaTxt = row[0]
+				if mediaTxt is None:
+					mediaTxt = "(NULL)"
+				media.append(mediaTxt)
+				code.append(row[1])
+
+			media = list(set(media))
+			code = list(set(code))
+
+			options['media'] = media
+			options['code'] = code
+
+			result['options'] = options
+
+		except Exception as exp:
+			result = {"success": False, "message": str(exp)}
+		finally:
+			self.conn.cursor().close()
+			self.conn.close()
+			return result
+
+	def get_log(self, params):
+		try:
+			self.connect_db()
 			result = {"success": True}
 
-			self.connect_db()
 			totalInfo = self.total(params)
 			result = totalInfo
 			if not totalInfo['success']: return
@@ -62,17 +120,38 @@ class KpfDb:
 			page = int(params['page'])
 			start = (page -1) * display
 
+			_MEDIA = ""
+			media = params['media']
+			if media != '':
+				_MEDIA = "AND media = '{}'".format(params['media'])
+    
+			_CODE = ""
+			code = params['code']
+			if code != '':
+				_CODE = "AND response_code = '{}'".format(params['code'])
+    
+			_LIMIT = ""
+			excel = params['excel']
+			if not excel :
+				_LIMIT = "LIMIT {start}, {display}".format(
+					start = start,
+					display = display
+				)
+
 			_SQL = """SELECT *
 				FROM news_ai_log
 				WHERE 1=1
 				AND request_date >= '{sdate} 00:00:00'
 				AND request_date <= '{edate} 23:59:59'
+				{_MEDIA}
+				{_CODE}
 				ORDER BY request_date DESC
-				LIMIT {start}, {display}""".format(
+				{_LIMIT}""".format(
 					sdate = params['sdate'],
 					edate = params['edate'],
-					start = start,
-					display = display
+					_MEDIA = _MEDIA,
+					_CODE = _CODE,
+					_LIMIT = _LIMIT
 				)
 
 			# print(_SQL)
@@ -99,5 +178,6 @@ class KpfDb:
 		except Exception as exp:
 			result = {"success": False, "message": str(exp)}
 		finally:
+			self.conn.cursor().close()
 			self.conn.close()
 			return result

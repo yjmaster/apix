@@ -25,13 +25,17 @@ $(document).ready(function(){
             $("#textResult").val("");
 
             let type = btn.attr("name");
+            if(type === "log"){
+                return false;
+            }
+
             if(type === "reset"){
                 $("#textTitle").val("");
                 $("#textContent").val("");
                 return false;
             }
 
-            let id_client = "8C131969-5015-D02E-CCF1-EB4624C93692";
+            let id_client = "881143FD-49DC-4F0B-9946-2E831A359C80";
             let title = $("#textTitle").val().trim();
             let content = $("#textContent").val().trim();
             let rowCnt = content.split("\n").length;

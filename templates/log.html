@@ -23,6 +23,12 @@
 	<script src="{{ url_for('static', filename='js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/object_utils.js') }}"></script>
+
+	<script src="{{ url_for('static', filename='js/sheet/xlsx.core.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/sheet/Blob.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sheet/FileSaver.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sheet/jhxlsx.js') }}"></script>
+
     <script src="{{ url_for('static', filename='js/log.js') }}"></script>
 	<script>
 		$(document).ready(function(){
@@ -41,31 +47,16 @@
 				<div>
 					<span>요청기간</span>
                     <input type="text" autocomplete="off" class="input_date form-control" id="dateRange" name="dateRange" placeholder="기간검색">
-                    <!--
-					<input type="text" class="form-control date_input" placeholder="2022-12-11">
-					<em>~</em>
-					<input type="text" class="form-control date_input" placeholder="2022-12-11">
-                    -->
 				</div>
 				<div>
 					<span>언론사</span>
-					<select class="form-control">
-						<option>전체</option>
-						<option>언론사1</option>
-						<option>언론사2</option>
-						<option>언론사3</option>
-					</select>
+					<select id="media" class="form-control"></select>
 				</div>
 				<div>
 					<span>결과</span>
-					<select class="form-control">
-						<option>전체</option>
-						<option>결과</option>
-						<option>결과</option>
-						<option>결과괄</option>
-					</select>
+					<select id="code" class="form-control"></select>
 				</div>
-				<button type="button" class="btn btn_top">검색</button>
+				<button type="button" id="search" class="btn btn_top">검색</button>
 			</div>
 			<!--//검색조건-->
 			<!--테이블-->
@@ -108,18 +99,18 @@
 			</div>
 			<!--//테이블-->
 			<div class="btn_wrap">
-				<button type="button" class="btn btn_down">EXCEL 다운로드</button>
+				<button type="button" id="excel" class="btn btn_down">EXCEL 다운로드</button>
 			</div>
 			<!--하단랩-->
 			<div class="flex_wrap">
 				<div><strong>Total : <span id="totalCnt">0</span></strong></div>
 				<div class="pagenation"></div>
 				<div>
-					<select class="form-control">
-						<option>10</option>
-						<option>20</option>
-						<option>30</option>
-						<option>50</option>
+					<select id="display" class="form-control">
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="30">30</option>
+						<option value="40">40</option>
 					</select>
 				</div>
 			</div>
