@@ -81,7 +81,7 @@ let log = {
             }
             $("#media").html(mhtml);
             $("#code").html(chtml);
-        });
+        }, false);
     },
     getLog: function(){
         let html = "";

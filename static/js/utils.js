@@ -1,14 +1,14 @@
 const escapeEmpty = function(value){if(value == null || value == undefined){return ""}else{ return value }}
 
 let Utils = {
-	call: function(method, url, data, callback){
+	call: function(method, url, data, callback, async=true){
 		$.ajax({
 			url: url,
 			contentType: 'application/json',
 			method: method,
 			// dataType: "json",
 			data: data,
-			async: false,
+			async: async,
 			beforeSend: function(xhr){
 				$.LoadingOverlay("show", {
 					background: "rgba(0, 0, 0, 0.5)",
