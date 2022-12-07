@@ -1,7 +1,8 @@
 import pymysql
 
 class BflysoftDb:
-	def __init__(self, host='118.67.152.68', user='yjuser', password='Yjuser(1104#$)', db='spell_check'):
+	# def __init__(self, host='118.67.152.68', user='yjuser', password='Yjuser(1104#$)', db='spell_check'):
+	def __init__(self, host='118.67.152.74', user='yjuser', password='Yjuser(1124#$)', db='spell_check'):
 		self.host = host
 		self.user = user
 		self.password = password

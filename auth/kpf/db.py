@@ -24,8 +24,11 @@ class KpfDb:
 			_MEDIA = ""
 			media = params['media']
 			if media != '':
-				_MEDIA = "AND media = '{}'".format(params['media'])
-    
+				if media == '(NULL)':
+					_MEDIA = "AND media IS NULL"
+				else:
+					_MEDIA = "AND media = '{}'".format(params['media'])
+
 			_CODE = ""
 			code = params['code']
 			if code != '':
@@ -123,7 +126,10 @@ class KpfDb:
 			_MEDIA = ""
 			media = params['media']
 			if media != '':
-				_MEDIA = "AND media = '{}'".format(params['media'])
+				if media == '(NULL)':
+					_MEDIA = "AND media IS NULL"
+				else:
+					_MEDIA = "AND media = '{}'".format(params['media'])
     
 			_CODE = ""
 			code = params['code']
