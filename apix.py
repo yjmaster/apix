@@ -15,14 +15,6 @@ from todo.todo import Todo
 ### kobart ###
 from modelAI.kobart import Kobart
 
-# ### GPT API ###
-# from extractor.extractor import Extractor
-# from extractor.cbs import CBS
-# from extractor.asiatimes import AsiaTimes
-
-# ### NEWS API ###
-# from news.news import News
-
 app = Flask(__name__)
 CORS(app)
 CORS(app, resources={r'*': {'origins': '*'}})
@@ -53,12 +45,7 @@ app.register_blueprint(kpf, url_prefix='/')
 # api.add_namespace(Auth, '/auth')
 
 api.add_namespace(Kobart, '/v1')
-# api.add_namespace(CBS, '/cbs')
-# api.add_namespace(AsiaTimes, '/asiatimes')
-
-# api.add_namespace(Extractor, '/extractor')
-# api.add_namespace(News, '/news')
 
 if __name__ == "__main__":
-    # app.run(debug=True, host='0.0.0.0', port=10001) #실제 운영 API 
-    app.run(debug=True, port=5000) # 테스트 API
+    app.run(debug=True, host='0.0.0.0', port=10001) #실제 운영 API 
+    # app.run(debug=True, port=5000) # 테스트 API
