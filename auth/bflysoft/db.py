@@ -1,12 +1,17 @@
+# -*- coding: utf-8 -*-
 import pymysql
+import configparser
 
 class BflysoftDb:
-	# def __init__(self, host='118.67.152.68', user='yjuser', password='Yjuser(1104#$)', db='spell_check'):
-	def __init__(self, host='118.67.152.74', user='yjuser', password='Yjuser(1124#$)', db='spell_check'):
-		self.host = host
-		self.user = user
-		self.password = password
-		self.db = db
+	def __init__(self):
+		config = configparser.ConfigParser()    
+		config.read('config.ini', encoding='utf-8')
+
+		beflydb = config['beflydb']
+		self.host = beflydb['host']
+		self.user = beflydb['user']
+		self.password = beflydb['password']
+		self.db = beflydb['db']
 
 	def connect_db(self):
 		self.conn = pymysql.connect(host=self.host, user=self.user, password=self.password, db=self.db, charset='utf8')

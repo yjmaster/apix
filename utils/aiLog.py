@@ -1,12 +1,18 @@
+# -*- coding: utf-8 -*-
 import uuid
 import pymysql
+import configparser
+
 class aiLog:
-	def __init__(self, host='localhost', user='kpf', password='kpf123', db='newsai'):
-	# def __init__(self, host='118.67.150.92', user='kpf', password='kpf123', db='newsai'):
-		self.host = host
-		self.user = user
-		self.password = password
-		self.db = db
+	def __init__(self):
+		config = configparser.ConfigParser()    
+		config.read('config.ini', encoding='utf-8')
+
+		kpfdb = config['kpfdb']
+		self.host = kpfdb['host']
+		self.user = kpfdb['user']
+		self.password = kpfdb['password']
+		self.db = kpfdb['db']
 
 	def connect_db(self):
 		self.conn = pymysql.connect(host=self.host, user=self.user, password=self.password, db=self.db, charset='utf8')

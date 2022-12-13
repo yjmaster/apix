@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import configparser
 from flask import Flask, request, redirect, url_for, render_template
 from flask_restx import Resource, Api, apidoc
 from flask_cors import CORS, cross_origin
@@ -46,6 +48,10 @@ app.register_blueprint(kpf, url_prefix='/')
 
 api.add_namespace(Kobart, '/v1')
 
+config = configparser.ConfigParser()
+config.read('config.ini', encoding='utf-8')
+kpfdb = config['kpf']
+
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=10001) #실제 운영 API 
-    # app.run(debug=True, port=5000) # 테스트 API
+    app.run(debug=True, host=kpfdb['host'], port=kpfdb['port']) #실제 운영 API 
+    # app.run(debug=True, port=kpfdb['port']) # 테스트 API
