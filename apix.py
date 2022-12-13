@@ -53,5 +53,5 @@ config.read('config.ini', encoding='utf-8')
 kpfdb = config['kpf']
 
 if __name__ == "__main__":
-    app.run(debug=True, host=kpfdb['host'], port=kpfdb['port']) #실제 운영 API 
+    app.run(host=kpfdb['host'], port=kpfdb['port']) #실제 운영 API 
     # app.run(debug=True, port=kpfdb['port']) # 테스트 API
