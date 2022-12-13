@@ -15,12 +15,18 @@
     <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
 	<script src="{{ url_for('static', filename='js/comMon.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/demo.js') }}"></script>
 </head>
 
 <body>
 	<div id="wraper">
+		<div class="edit_wrap">
+			<button type="button" onclick="Utils.logout()" class="btn btn-outline-primary me-2">로그아웃</button>
+			<button type="button" onclick="location.href='/log'" class="btn btn-outline-primary me-2">로그보기</button>
+		</div>
+		
 		<div class="edit_wrap">
 			<div class="tit_wrap">
 				<h1><span>YJMEDIA</span> <span>NEWS AI</span> TEST</h1>
@@ -37,7 +43,6 @@
 				<button type="button" name="subTitle" class="btn">subTitle</button>
 				<button type="button" name="oneLine" class="btn">oneLine</button>
 				<!--<button type="button" name="topic" class="btn">topic</button>-->
-				<button type="button" onclick="location.href='/log'" name="log" class="btn" style="float: right;">Log</button>
 				<button type="button" name="reset" class="btn" style="float: right;">Reset</button>
 				
 			</div>

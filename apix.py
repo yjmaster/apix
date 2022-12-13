@@ -32,16 +32,13 @@ api = Api(
 )
 app.register_blueprint(kpf, url_prefix='/')
 
-# @api.documentation
-# def custom_ui():
-#     #authCheck = request.headers.get('Authorization')
-#     token = request.cookies.get('access_token')
-#     print("token : ", token)
-#     if token is None:
-#         return redirect(url_for('kpf.login'))
-#     else :
-#         return apidoc.ui_for(api)
-    
+@api.documentation
+def custom_ui():
+    token = request.cookies.get('access_token')
+    if token is None:
+        return redirect(url_for('kpf.login'))
+    else:
+        return redirect(url_for('kpf.demo'))
 
 # api.add_namespace(Todo, '/todo')
 # api.add_namespace(Auth, '/auth')

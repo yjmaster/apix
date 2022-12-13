@@ -38,11 +38,11 @@ let Utils = {
 	},
 	logout: function(){
 		if($.cookie('access_token')){
-				$.removeCookie('access_token');
-				alert("You are logged out");
+			$.removeCookie('access_token');
+			alert("로그아웃 되었습니다.");
 		}else{
-				alert('token does not exist');
+			alert('세션이 만료되었습니다.');
 		}
-		window.location = `/${Main.media}/login`;
+		window.location = `/login`;
 	}
 }

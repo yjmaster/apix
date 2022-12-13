@@ -17,6 +17,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
 	<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="{{ url_for('static', filename='js/comMon.js') }}"></script>
     <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lightpick.js') }}"></script>
@@ -39,6 +40,11 @@
 
 <body>
 	<div id="wraper">
+		<div class="edit_wrap">
+			<button type="button" onclick="Utils.logout()" class="btn btn-outline-primary me-2">로그아웃</button>
+			<button type="button" onclick="location.href='/demo'" class="btn btn-outline-primary me-2">데모화면</button>
+		</div>
+
 		<div class="edit_wrap">
 			<h2>API 로그조회</h2>
 

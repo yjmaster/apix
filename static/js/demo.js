@@ -25,9 +25,6 @@ $(document).ready(function(){
             $("#textResult").val("");
 
             let type = btn.attr("name");
-            if(type === "log"){
-                return false;
-            }
 
             if(type === "reset"){
                 $("#textTitle").val("");

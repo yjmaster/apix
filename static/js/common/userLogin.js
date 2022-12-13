@@ -1,26 +1,4 @@
-console.log("userLogin.js");
-
-let media = '';
-let login_url = '';
-let main_url = '';
 let pathName = window.location.pathname;
-let apiUrl = 'http://localhost:5000';
-// let apiUrl = 'http://211.232.77.118:10001';
-
-
-media = "kpf";
-login_url = `${apiUrl}/login`;
-main_url = `${apiUrl}/`;
-
-
-if(isLogin !== ''){
-    alert(isLogin);
-    window.location = login_url;
-}
-
-// if($.cookie('access_token')){    
-//     window.location = main_url;
-// }
 
 $("#password").keydown(function (key){
     if(key.keyCode == 13){
@@ -41,20 +19,20 @@ function userLogin(){
         return false;
     }
 
-    //console.log("login_url : ", login_url);
-    let loginData = { user_login, password, media };
+    let loginData = { user_login, password };
 
     $.ajax({
-        url: login_url,
+        url: '/login',
         contentType: 'application/json',
         method: 'POST',
         data: JSON.stringify(loginData)
     }).done(function(res){
-        console.log(res)
         if(res.success){
-            $.cookie('access_token', res.access_token);
-            console.log("main_url", main_url)
-            window.location = main_url;
+            let date = new Date();
+            var minutes = 120; 
+            date.setTime(date.getTime() + (minutes * 60 * 1000));
+            $.cookie("access_token", res.id_client, { expires: date });
+            window.location = '/demo';
         }else{
             alert(res['message']);
             return false;
