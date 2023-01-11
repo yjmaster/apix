@@ -23,6 +23,8 @@ class UserDb:
 	def create_token(self, userInfo):
 		access_token = jwt.encode(userInfo, "yjmedia", algorithm="HS256")
 		osName = platform.system()
+		print("osName : ")
+		print(osName)
 		if osName != 'Windows':
 			access_token = access_token.decode('utf-8')
 

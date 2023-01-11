@@ -3,12 +3,11 @@ from flask_restx import Resource, Api, apidoc
 from flask_cors import CORS, cross_origin
 
 from controller import yjmedia
-from controller import kpf
 
-from auth.user import Auth
-from auth.db.userDb import UserDb
+# from auth.user import Auth
+# from auth.db.userDb import UserDb
 
-userDb = UserDb()
+# userDb = UserDb()
 
 ### sample ###
 from todo.todo import Todo 
@@ -46,11 +45,9 @@ api = Api(
 )
 
 app.register_blueprint(yjmedia, url_prefix='/')
-app.register_blueprint(kpf, url_prefix='/kpf')
 
 @api.documentation
 def custom_ui():
-    #authCheck = request.headers.get('Authorization')
     token = request.cookies.get('access_token')
     if token is None:
         return redirect(url_for('yjmedia.login'))
@@ -59,7 +56,7 @@ def custom_ui():
     
 
 api.add_namespace(Todo, '/todo')
-api.add_namespace(Auth, '/auth')
+# api.add_namespace(Auth, '/auth')
 api.add_namespace(Kobart, '/v1')
 api.add_namespace(CBS, '/cbs')
 api.add_namespace(AsiaTimes, '/asiatimes')

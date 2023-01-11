@@ -20,8 +20,12 @@ Kobart = Namespace(
 )
 
 # request model
-kobart_req = Kobart.model('asia_req', {
-    'contents': fields.String(required=True, description='기사 본문',
+kobart_req = Kobart.model('semple_req', {
+    'id_client': fields.String(required=True, description='클라이언트ID',
+        example="CE746CE9-7456-11ED-94D7-7B233ECE4E1A"),
+    'title': fields.String(required=True, description='기사 제목',
+        example="'신발투척' 정창옥 광복절 집회서 경찰 폭행으로 또 구속 기로"),
+    'content': fields.String(required=True, description='기사 본문',
         example="집단감염 우려 속에 서울 도심에서 강행된 광복절 집회에서 경찰에 폭력을 행사하는 등 공무집행을 방해한 참가자 2명이 18일 오후 구속심사를 받기 위해 법원에 출석했다.\n"+
                 "2명 중 1명은 지난달 국회를 방문한 문재인 대통령을 향해 신발을 던졌던 정창옥(57)씨다. 정씨는 당시 구속 위기를 면했지만 이번엔 집회에서 경찰을 폭행한 혐의로 다시 구속 갈림길에 섰다.\n"+
                 "서울중앙지법 최창훈 영장전담 부장판사는 이날 오후 3시부터 공무집행방해 등 혐의를 받는 정씨의 구속 전 피의자 심문(영장실질심사)을 진행한다.\n"+
@@ -55,8 +59,15 @@ class KobartKeyword(Resource):
 		## Output Arguments
 		``` json
 		{
-			"success": true,
-			"extractor": ""
+			"code": 200,
+			"extractor": [
+				"정창옥",
+				"경찰",
+				"신발투척",
+				"구속",
+				"광복절"
+			],
+			"success": true
 		}
 		```
 		"""
@@ -130,9 +141,13 @@ class KobartKeyword(Resource):
 				res = complete_res
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
+			
+			del logInfo['router']
+			del logInfo['id_client']
+			del logInfo['uid']
+			del logInfo['media']
 
 			print("------------------------------------")
-			print("logInfo : ", logInfo)
 			print("finally: ", res)
 			print("------------------------------------")
 			return make_response(res, logInfo['code'])
