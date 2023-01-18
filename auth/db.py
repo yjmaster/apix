@@ -3,7 +3,7 @@ import math
 import pymysql
 
 class YJDb:
-	def __init__(self, host='192.168.0.190', user='maria', password='maria123', db='maria_DB'):
+	def __init__(self, host='192.168.0.190', user='maria', password='maria123', db='newsai'):
 		self.host = host
 		self.user = user
 		self.password = password

@@ -20,7 +20,7 @@ Kobart = Namespace(
 )
 
 # request model
-kobart_req = Kobart.model('semple_req', {
+kobart_req = Kobart.model('sample_req', {
     'id_client': fields.String(required=True, description='클라이언트ID',
         example="CE746CE9-7456-11ED-94D7-7B233ECE4E1A"),
     'title': fields.String(required=True, description='기사 제목',
@@ -37,7 +37,8 @@ kobart_req = Kobart.model('semple_req', {
 })
 
 # response model
-kobart_res = Kobart.model('asia_res', {
+kobart_res = Kobart.model('sample_res', {
+    'code': fields.Integer(description='API Success/Failure', required=True),
     'success': fields.Boolean(description='API Success/Failure', required=True),
     'extractor': fields.String(description='Success/Failure message', required=True)
 })
@@ -77,8 +78,10 @@ class KobartKeyword(Resource):
 			router = (request.url_rule.rule).split("/")[-1]
 
 			id_client = args['id_client']
-			title = args['title']
 			content = args['content']
+
+			if 'title' not in args:
+				args['title'] = ""
 
 			logInfo = {
 				'code': 200,
@@ -142,6 +145,141 @@ class KobartKeyword(Resource):
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
 			
+			del logInfo['router']
+			del logInfo['id_client']
+			del logInfo['uid']
+			del logInfo['media']
+
+			print("------------------------------------")
+			print("finally: ", res)
+			print("------------------------------------")
+			return make_response(res, logInfo['code'])
+
+@Kobart.route('/topic')
+class KobartTopic(Resource):
+	@Kobart.doc(parser=kobart_req)
+	@Kobart.response(200, 'API Success/Failure', kobart_res)
+	@Kobart.response(400, 'Failure')
+	@Kobart.response(500, 'Error')
+	def post(self):
+		"""
+		주제 분류 (kobart) API 입니다.
+
+		# Input Arguments 를 JSON 형식으로 전달합니다.
+
+		**contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
+        
+		## Output Arguments
+		``` json
+		{
+			"code": 200,
+			"extractor": [
+				{
+					"label": "정치",
+					"scores": 73.77
+				},
+				{
+					"label": "사회",
+					"scores": 18.17
+				},
+				{
+					"label": "연예",
+					"scores": 3.09
+				},
+				{
+					"label": "스포츠",
+					"scores": 1.59
+				},
+				{
+					"label": "산업",
+					"scores": 1.18
+				},
+				{
+					"label": "세계",
+					"scores": 1.16
+				},
+				{
+					"label": "문화",
+					"scores": 0.89
+				},
+				{
+					"label": "경제",
+					"scores": 0.16
+				}
+			],
+			"success": true
+		}
+		```
+		"""
+		
+		try:
+			res =  {}
+			args = textFormat.parse_data(request)
+			router = (request.url_rule.rule).split("/")[-1]
+
+			title = ""
+			id_client = args['id_client']
+			if 'title' in args:
+				title = args['title']
+
+			content = args['content']
+
+			logInfo = {
+				'code': 200,
+				'router': router,
+				'id_client': id_client
+			}
+
+			# 호출 로그를 남겨준다.
+			res = log.request_log(logInfo)
+			logInfo.update(res)
+			if not logInfo['success']: return
+
+			# 키 인증을 받는다.
+			res = log.authentication(id_client)
+			logInfo.update(res)
+			if not res['success']: return
+
+			# 데이터 유효성 체크
+			sents = textFormat.contentAnalysis(content)
+			if len(sents) < 5:
+				logInfo.update({
+					"success": False,
+					"message": "5문장 이상 입력해주세요.",
+					'code': 400
+				})
+				res = logInfo
+				return
+
+			# 주제 분류 추출
+			url = 'http://192.168.0.190:5000/kobart_v1/topic'
+			headers = {'Content-Type':'application/json; charset=utf-8'}
+
+			req = requests.post(url, json=args, headers=headers)
+			if req.status_code == 200 :
+				res = json.loads(req.text)
+				logInfo.update(res)
+				res = logInfo
+			else:
+				logInfo.update({
+					"success": False,
+					"message": "AI서버 문제입니다.",
+					'code': req.status_code
+				})
+				res = logInfo
+				return
+
+		except Exception as exp:
+			res = {"success": False, "code": 400, "message": str(exp)}
+			logInfo.update(res)
+		finally:
+			# 완료 로그를 남겨준다.
+			complete_res = log.response_log(logInfo, args)
+			if not complete_res['success']:
+				res = complete_res
+				logInfo.update(complete_res)
+				log.response_log(logInfo, args)
+
 			del logInfo['router']
 			del logInfo['id_client']
 			del logInfo['uid']
