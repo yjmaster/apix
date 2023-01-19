@@ -47,7 +47,7 @@ gpt_res = Gpt.model('gpt_res', {
 })
 
 @Gpt.route('/sentiment')
-class Sentiment(Resource):
+class GptSentiment(Resource):
 	@Gpt.doc(parser=gpt_req)
 	@Gpt.response(200, 'API Success/Failure', gpt_res)
 	@Gpt.response(400, 'Failure')
@@ -60,11 +60,13 @@ class Sentiment(Resource):
 
 		**contents**: str : required **(필수)** : 기사의 본문 입니다. ( 태그가 존재 하면 안됩니다. )
 
+		(5: 강한긍정, 4: 긍정, 3: 중립, 2: 부정, 1: 강한부정)
+
 		## Output Arguments
 		``` json
 		{
 			"code": 200,
-			"extractor": "집단감염 우려 속에 서울 도심에서 강행된 광복절 집회에서 경찰에 폭력을 행사하는 등 공무집행을 방해한 참가자 2명이 18일 오후 구속심사를 받기 위해 법원에 출석했다.\n\n정씨는 당시 구속 위기를 면했지만 이번엔 집회에서 경찰을 폭행한 혐의로 다시 구속 갈림길에 섰다.\n\n오후 2시 35분께 법원 앞에 모습을 드러낸 정씨는 '두 번째 영장심사인데 심경은 어떤가'라는 취재진 질문에 \"담담하다, 괜찮다\"며 \"왜 구속이 됐는지 모르겠고, 그냥 평화적으로 청와대로 가는 사람을 붙잡았다. 그것에 대해서 항거할 것\"이라고 답했다.\n\n",
+			"extractor": "1",
 			"success": true
 		}
 		```
