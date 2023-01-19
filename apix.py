@@ -12,12 +12,14 @@ from controller import yjmedia
 ### sample ###
 from todo.todo import Todo 
 
-### kobart ###
+### SERVICE AI ###
 from serviceAI.kobart import Kobart
+from serviceAI.gpt import Gpt
+from serviceAI.etc import Etc
 
 ### GPT API ###
 from extractor.extractor import Extractor
-from extractor.cbs import CBS
+# from extractor.cbs import CBS
 from extractor.asiatimes import AsiaTimes
 
 ### NEWS API ###
@@ -57,8 +59,12 @@ def custom_ui():
 
 api.add_namespace(Todo, '/todo')
 # api.add_namespace(Auth, '/auth')
+
 api.add_namespace(Kobart, '/v1')
-api.add_namespace(CBS, '/cbs')
+api.add_namespace(Gpt, '/v2')
+api.add_namespace(Etc, '/v3')
+
+# api.add_namespace(CBS, '/cbs')
 api.add_namespace(AsiaTimes, '/asiatimes')
 
 api.add_namespace(Extractor, '/extractor')
