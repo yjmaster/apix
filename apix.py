@@ -46,7 +46,7 @@ api = Api(
     license="MIT"
 )
 
-app.register_blueprint(kobart_v1, url_prefix='/kobart_v1')
+app.register_blueprint(kobart_v1, url_prefix='/v1')
 app.register_blueprint(yjmedia, url_prefix='/')
 app.register_blueprint(kpf, url_prefix='/kpf')
 
