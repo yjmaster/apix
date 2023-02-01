@@ -175,9 +175,12 @@ class koBart_title(Resource):
 				res = complete_res
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
-    
-			sendJson["success"] = res["success"]
-			sendJson["extractor"] = res["extractor"]
+
+			if res['code'] != 200:
+				sendJson = res
+			else:
+				sendJson["success"] = res["success"]
+				sendJson["extractor"] = res["extractor"]
 			
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
@@ -304,8 +307,11 @@ class KobartKeyword(Resource):
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
 
-			sendJson["success"] = res["success"]
-			sendJson["extractor"] = res["extractor"]
+			if res['code'] != 200:
+				sendJson = res
+			else:
+				sendJson["success"] = res["success"]
+				sendJson["extractor"] = res["extractor"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
@@ -400,9 +406,12 @@ class KobartKeyword(Resource):
 				res = complete_res
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
-    
-			sendJson["success"] = res["success"]
-			sendJson["extractor"] = res["extractor"]
+
+			if res['code'] != 200:
+				sendJson = res
+			else:
+				sendJson["success"] = res["success"]
+				sendJson["extractor"] = res["extractor"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
@@ -492,8 +501,11 @@ class koBart_title(Resource):
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
 
-			sendJson["success"] = res["success"]
-			sendJson["extractor"] = res["extractor"]
+			if res['code'] != 200:
+				sendJson = res
+			else:
+				sendJson["success"] = res["success"]
+				sendJson["extractor"] = res["extractor"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)

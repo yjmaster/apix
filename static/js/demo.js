@@ -35,7 +35,6 @@ $(document).ready(function(){
             let id_client = $.cookie('access_token');
             let title = $("#textTitle").val().trim();
             let content = $("#textContent").val().trim();
-            let rowCnt = content.split("\n").length;
 
             if(type === "keyword"){
                 if(title === ""){
@@ -48,11 +47,6 @@ $(document).ready(function(){
             if(content === ""){
                 alert("내용을 입력해주세요");
                 $("#textResult").val("");
-                return false;
-            }
-
-            if(rowCnt < 5){
-                alert("5줄 이상 입력해주세요.");
                 return false;
             }
 
