@@ -1,6 +1,6 @@
 let pathName = window.location.pathname;
 
-$("#password").keydown(function (key){
+$("#user_pwd").keydown(function (key){
     if(key.keyCode == 13){
         userLogin();
     }
