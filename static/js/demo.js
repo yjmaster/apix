@@ -32,7 +32,7 @@ $(document).ready(function(){
                 return false;
             }
 
-            let id_client = "881143FD-49DC-4F0B-9946-2E831A359C80";
+            let id_client = $.cookie('access_token');
             let title = $("#textTitle").val().trim();
             let content = $("#textContent").val().trim();
             let rowCnt = content.split("\n").length;
@@ -76,7 +76,8 @@ $(document).ready(function(){
                     finalText = finalText.trim();
                     $("#textResult").val(finalText);
                 }else{
-                    $("#textResult").val(res.message);
+                    alert(res.message);
+                    $("#textResult").val("");
                 }
             })
         }

@@ -113,15 +113,26 @@ class koBart_title(Resource):
 				})
 				res = logInfo
 				return
+			elif len(sents) > 33:
+				content = ""
+				sents2 = sents[0:32]
+				for idx, sent2 in enumerate(sents2):
+					content += sent2
+				# print("content : ", content)
+				# print("-----------------------------")
+				# print("sents2 : ", sents2)
+				# print("-----------------------------")
+				# print(len(sents2))
 
 			for idx, sent in enumerate(sents):
 				if idx < 3: top3Summary += sent
-    
+
 			args['summary'] = top3Summary
                 
 			# 제목추출
 			titles = []
 			title1 = kobart_api.kobart_title(content)
+			# print("title1 : ", title1)
 			# title1 = {"success": False, "code": 400, "message": "제목추출에러1"}
 			# title1 = {"success": True, "extractor": "제목추출1"}
 			if not title1['success']:
@@ -130,6 +141,7 @@ class koBart_title(Resource):
 				return
 
 			title2 = kobart_api.kobart_title(top3Summary)
+			# print("title2 : ", title2)
 			# title2 = {"success": False, "code": 400, "message": "제목추출에러2"}
 			# title2 = {"success": True, "extractor": "제목추출2"}
 			if not title2['success']:
@@ -155,18 +167,23 @@ class koBart_title(Resource):
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
+			sendJson = {}
+			
 			# 완료 로그를 남겨준다.
 			complete_res = log.response_log(logInfo, args)
 			if not complete_res['success']:
 				res = complete_res
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
-
+    
+			sendJson["success"] = res["success"]
+			sendJson["extractor"] = res["extractor"]
+			
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
-			print("finally: ", res)
+			print("finally: ", sendJson)
 			print("------------------------------------")
-			return make_response(res, logInfo['code'])
+			return make_response(sendJson, logInfo['code'])
 
 @Kobart.route('/keyword')
 class KobartKeyword(Resource):
@@ -227,6 +244,17 @@ class KobartKeyword(Resource):
 				})
 				res = logInfo
 				return
+			elif len(sents) > 33:
+				content = ""
+				sents2 = sents[0:32]
+				for idx, sent2 in enumerate(sents2):
+					content += sent2
+				# print("content : ", content)
+				# print("-----------------------------")
+				# print("sents2 : ", sents2)
+				# print("-----------------------------")
+				# print(len(sents2))
+
 
 			for idx, sent in enumerate(sents):
 				if idx < 3: top3Summary += sent
@@ -268,6 +296,7 @@ class KobartKeyword(Resource):
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
+			sendJson = {}
 			# 완료 로그를 남겨준다.
 			complete_res = log.response_log(logInfo, args)
 			if not complete_res['success']:
@@ -275,11 +304,14 @@ class KobartKeyword(Resource):
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
 
+			sendJson["success"] = res["success"]
+			sendJson["extractor"] = res["extractor"]
+
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
-			print("finally: ", res)
+			print("finally: ", sendJson)
 			print("------------------------------------")
-			return make_response(res, logInfo['code'])
+			return make_response(sendJson, logInfo['code'])
 
 @Kobart.route('/subTitle')
 class KobartKeyword(Resource):
@@ -361,18 +393,22 @@ class KobartKeyword(Resource):
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
+			sendJson = {}
 			# 완료 로그를 남겨준다.
 			complete_res = log.response_log(logInfo, args)
 			if not complete_res['success']:
 				res = complete_res
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
+    
+			sendJson["success"] = res["success"]
+			sendJson["extractor"] = res["extractor"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
-			print("finally: ", res)
+			print("finally: ", sendJson)
 			print("------------------------------------")
-			return make_response(res, logInfo['code'])
+			return make_response(sendJson, logInfo['code'])
 
 @Kobart.route('/oneLine')
 class koBart_title(Resource):
@@ -427,6 +463,11 @@ class koBart_title(Resource):
 				})
 				res = logInfo
 				return
+			elif len(sents) > 33:
+				content = ""
+				sents2 = sents[0:32]
+				for idx, sent2 in enumerate(sents2):
+					content += sent2
 
 			# 한줄 요약 추출
 			oneLine = kobart_api.kobart_summary_short(content)
@@ -443,6 +484,7 @@ class koBart_title(Resource):
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
+			sendJson = {}
 			# 완료 로그를 남겨준다.
 			complete_res = log.response_log(logInfo, args)
 			if not complete_res['success']:
@@ -450,11 +492,14 @@ class koBart_title(Resource):
 				logInfo.update(complete_res)
 				log.response_log(logInfo, args)
 
+			sendJson["success"] = res["success"]
+			sendJson["extractor"] = res["extractor"]
+
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
-			print("finally: ", res)
+			print("finally: ", sendJson)
 			print("------------------------------------")
-			return make_response(res, logInfo['code'])
+			return make_response(sendJson, logInfo['code'])
 
 ''' @Kobart.route('/topic')
 class koBart_title(Resource):
