@@ -135,6 +135,14 @@ class TextFormat:
 		refinedWord = []
 		keywords = list(set(keywords))
 		for keyword in keywords:
+			removeText = [r"\)",r"\("]
+			for rt in removeText:
+				checkRe = re.search(rt, keyword)
+				if checkRe:
+					keyword = keyword.replace(checkRe.group(0),"")
+					hangul = re.compile('[^ ㄱ-ㅣ가-힣]+') # 한글과 띄어쓰기를 제외한 모든 글자
+					keyword = hangul.sub('', keyword) # 한글과 띄어쓰기를 제외한 모든 부분을 제거
+
 			word = re.compile(keyword)
 			existWord = word.search(contents)
 			if existWord :
