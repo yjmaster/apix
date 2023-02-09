@@ -90,6 +90,19 @@ class TextFormat:
 				content = content.replace(matchText, "")
 		return content
 
+	def removeEmoji(self, content):
+		emoji_pattern = re.compile("["
+			u"\U0001F600-\U0001F64F"  # emoticons
+			u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+			u"\U0001F680-\U0001F6FF"  # transport & map symbols
+			u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+		"]+", flags=re.UNICODE)
+
+		findEmoji = emoji_pattern.findall(content)
+		if len(findEmoji) > 0:
+			content = emoji_pattern.sub(r'', content)
+		return content
+
 	def contentAnalysis(self, content):
 		self.temp_list = []
 		self.sent_list = []
@@ -98,8 +111,8 @@ class TextFormat:
 
 		# ()안에 문장이 한글이면 삭제
 		#content = self.removeBracket(content)
-
 		content = self.quoteReplace(content)
+		content = self.removeEmoji(content)
 
 		# (), "" 문구 안에 문장이 짤리면 안됨
 		content = self.separateExtraction(content)

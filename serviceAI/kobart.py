@@ -110,6 +110,11 @@ class KobartKeyword(Resource):
 				})
 				res = logInfo
 				return
+			elif len(sents) > 33:
+				content = ""
+				sents2 = sents[0:32]
+				for idx, sent2 in enumerate(sents2):
+					content += sent2
 
 			for idx, sent in enumerate(sents):
 				if idx < 3: top3Summary += sent
@@ -119,7 +124,8 @@ class KobartKeyword(Resource):
 			# 키워드 추출
 			url = 'http://192.168.0.190:5000/v1/keyword'
 			headers = {'Content-Type':'application/json; charset=utf-8'}
-
+			
+			args['content'] = content
 			req = requests.post(url, json=args, headers=headers)
 			if req.status_code == 200 :
 				res = json.loads(req.text)
@@ -250,11 +256,17 @@ class KobartTopic(Resource):
 				})
 				res = logInfo
 				return
+			elif len(sents) > 33:
+				content = ""
+				sents2 = sents[0:32]
+				for idx, sent2 in enumerate(sents2):
+					content += sent2
 
 			# 주제 분류 추출
 			url = 'http://192.168.0.190:5000/v1/topic'
 			headers = {'Content-Type':'application/json; charset=utf-8'}
 
+			args['content'] = content
 			req = requests.post(url, json=args, headers=headers)
 			if req.status_code == 200 :
 				res = json.loads(req.text)

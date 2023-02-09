@@ -76,6 +76,7 @@ class Textrank(Resource):
 
 			id_client = args['id_client']
 			content = args['content']
+			summary = ""
 
 			if 'title' not in args:
 				args['title'] = ""
