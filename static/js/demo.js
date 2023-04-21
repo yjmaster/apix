@@ -33,6 +33,8 @@ $(document).ready(function(){
             }
 
             let id_client = $.cookie('access_token');
+            let media = $.cookie('media');
+
             let title = $("#textTitle").val().trim();
             let content = $("#textContent").val().trim();
 
@@ -50,7 +52,7 @@ $(document).ready(function(){
                 return false;
             }
 
-            let sendData = JSON.stringify({id_client, title, content});
+            let sendData = JSON.stringify({id_client, media, title, content});
             Utils.call('POST', `/v1/${type}`, sendData, function(res){
                 if(res.success){
                     let resText = res.extractor;

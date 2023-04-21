@@ -83,12 +83,14 @@ class koBart_title(Resource):
 			router = (request.url_rule.rule).split("/")[-1]
 
 			id_client = args['id_client']
+			media = args['media']
 			content = args['content']
 
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client
+				'id_client': id_client,
+				'media': media
 			}
 
 			# 호출 로그를 남겨준다.
@@ -216,13 +218,15 @@ class KobartKeyword(Resource):
 			router = (request.url_rule.rule).split("/")[-1]
 
 			id_client = args['id_client']
+			media = args['media']
 			title = args['title']
 			content = args['content']
 
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client
+				'id_client': id_client,
+				'media': media
 			}
 
 			# 호출 로그를 남겨준다.
@@ -347,6 +351,7 @@ class KobartKeyword(Resource):
 			router = (request.url_rule.rule).split("/")[-1]
 
 			id_client = args['id_client']
+			media = args['media']
 			title = args['title']
 			content = args['content']
 
@@ -354,7 +359,7 @@ class KobartKeyword(Resource):
 				'code': 200,
 				'router': router,
 				'id_client': id_client,
-				'media': 'tester'
+				'media': media
 			}
 
 			# 호출 로그를 남겨준다.
@@ -448,13 +453,14 @@ class koBart_title(Resource):
 			router = (request.url_rule.rule).split("/")[-1]
 
 			id_client = args['id_client']
+			media = args['media']
 			content = args['content']
 
 			logInfo = {
 				'code': 200,
 				'router': router,
 				'id_client': id_client,
-				'media': 'tester'
+				'media': media
 			}
 
 			# 호출 로그를 남겨준다.

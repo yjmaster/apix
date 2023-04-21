@@ -21,6 +21,7 @@ class KpfUser:
 			user = curs.fetchone()
 			if user:
 				result["id_client"] = user[0]
+				result["media"] = user[1]
 			else:
 				result["success"] = False
 				result["message"] = "존재하지 않는 사용자 입니다."

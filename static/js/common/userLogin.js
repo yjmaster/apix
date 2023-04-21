@@ -32,6 +32,7 @@ function userLogin(){
             var minutes = 120; 
             date.setTime(date.getTime() + (minutes * 60 * 1000));
             $.cookie("access_token", res.id_client, { expires: date });
+            $.cookie("media", res.media, { expires: date });
             window.location = '/demo';
         }else{
             alert(res['message']);
