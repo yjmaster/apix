@@ -33,6 +33,12 @@
     <script src="{{ url_for('static', filename='js/log.js') }}"></script>
 	<script>
 		$(document).ready(function(){
+			let accessType =  "{{accessType}}"
+			if(accessType === "key"){
+				$("#btn_area").hide();
+			}else if(accessType === "token"){
+				$("#btn_area").show();
+			}
 			log.init();
 		});
 	</script>
@@ -40,7 +46,7 @@
 
 <body>
 	<div id="wraper">
-		<div class="edit_wrap">
+		<div class="edit_wrap" id="btn_area">
 			<button type="button" onclick="Utils.logout()" class="btn btn-outline-primary me-2">로그아웃</button>
 			<button type="button" onclick="location.href='/demo'" class="btn btn-outline-primary me-2">데모화면</button>
 		</div>
