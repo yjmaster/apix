@@ -46,7 +46,7 @@ def log():
                 if isValidkey["success"]:
                     return render_template('log.html', accessType = "key")
                 else:
-                    return render_template('login.html')
+                    return render_template('login.html', accessType = "key")
         else:
             return render_template('log.html', accessType = "token")
     elif request.method == 'POST':
