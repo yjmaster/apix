@@ -59,14 +59,25 @@ class aiLog:
 			uid = uuid.uuid1()
 			res = {"success": True, "uid": uid}
 
+			media_sql = ""
+			message_sql = ""
+			if reqInfo["success"]: pass
+			else:
+				message = reqInfo["message"]
+				message_sql = "error_msg = '{}' ,".format(message)
+
 			_SQL = """INSERT INTO news_ai_log SET
 					`uid` = '{uid}',
 					id_client = '{id_client}',
+					{media_sql}
+					{message_sql}
 					router = '{router}',
 					request_date = NOW()""".format(
 						uid = uid,
 						router = reqInfo['router'],
-						id_client = reqInfo['id_client']
+						id_client = reqInfo['id_client'],
+						media_sql = media_sql,
+						message_sql = message_sql
 					)
 
 			# print("호출 로그 ----------> \n", _SQL)
@@ -95,14 +106,18 @@ class aiLog:
 				message = self.conn.escape_string(resInfo['message'])
 				message_sql = "error_msg = '{}' ,".format(message)
 
+			media_sql = ""
+			if "media" in resInfo:
+				media_sql = "media = '{}',".format(resInfo['media'])
+
 			_SQL = """UPDATE news_ai_log SET
-					media = '{media}',
+					{media_sql}
 					{message_sql}
 					response_date = NOW(),
 					response_code = '{code}'
 				WHERE 1=1
 				AND `uid` = '{uid}'""".format(
-						media = resInfo['media'],
+						media_sql = media_sql,
 						message_sql = message_sql,
 						code = code,
 						uid = uid

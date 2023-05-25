@@ -17,12 +17,14 @@ kobart_api = kobart_inference_API()
 
 # custom db
 from auth.bflysoft.db import BflysoftDb
+from auth.kpf.user import KpfUser
 
 # custom modules
 from utils.textFormat import TextFormat
 from utils.customWord import CustomWord
 from utils.aiLog import aiLog
 
+kpfUser = KpfUser()
 bflysoftDb = BflysoftDb()
 textFormat = TextFormat()
 customWord = CustomWord()
@@ -81,17 +83,18 @@ class koBart_title(Resource):
 			res =  {}
 			args = textFormat.parse_data(request)
 			router = (request.url_rule.rule).split("/")[-1]
-
 			id_client = args['id_client']
-			media = args['media']
 			content = args['content']
 
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client,
-				'media': media
+				'id_client': id_client
 			}
+
+			# 재단 디비에서 사용자 인증을 한다.
+			res = kpfUser.find_key(id_client)
+			logInfo.update(res)
 
 			# 호출 로그를 남겨준다.
 			res = log.request_log(logInfo)
@@ -216,18 +219,19 @@ class KobartKeyword(Resource):
 			res =  {}
 			args = textFormat.parse_data(request)
 			router = (request.url_rule.rule).split("/")[-1]
-
 			id_client = args['id_client']
-			media = args['media']
 			title = args['title']
 			content = args['content']
 
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client,
-				'media': media
+				'id_client': id_client
 			}
+
+			# 재단 디비에서 사용자 인증을 한다.
+			res = kpfUser.find_key(id_client)
+			logInfo.update(res)
 
 			# 호출 로그를 남겨준다.
 			res = log.request_log(logInfo)
@@ -349,18 +353,19 @@ class KobartKeyword(Resource):
 			res =  {}
 			args = textFormat.parse_data(request)
 			router = (request.url_rule.rule).split("/")[-1]
-
 			id_client = args['id_client']
-			media = args['media']
 			title = args['title']
 			content = args['content']
 
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client,
-				'media': media
+				'id_client': id_client
 			}
+
+			# 재단 디비에서 사용자 인증을 한다.
+			res = kpfUser.find_key(id_client)
+			logInfo.update(res)
 
 			# 호출 로그를 남겨준다.
 			res = log.request_log(logInfo)
@@ -459,9 +464,12 @@ class koBart_title(Resource):
 			logInfo = {
 				'code': 200,
 				'router': router,
-				'id_client': id_client,
-				'media': media
+				'id_client': id_client
 			}
+
+			# 재단 디비에서 사용자 인증을 한다.
+			res = kpfUser.find_key(id_client)
+			logInfo.update(res)
 
 			# 호출 로그를 남겨준다.
 			res = log.request_log(logInfo)
