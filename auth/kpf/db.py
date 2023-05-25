@@ -39,15 +39,24 @@ class KpfDb:
 			if code != '':
 				_CODE = "AND response_code = '{}'".format(params['code'])
 
+			_KEY = ""
+			key = params['key']
+			if key and key != "881143FD-49DC-4F0B-9946-2E831A359C80":
+				_KEY = "AND id_client = '{id_client}'".format(
+					id_client = key
+				)
+
 			_SQL = """SELECT count(*)
 				FROM news_ai_log
 				WHERE 1=1
 				{_MEDIA}
 				{_CODE}
+				{_KEY}
 				AND request_date >= '{sdate} 00:00:00'
 				AND request_date <= '{edate} 23:59:59'""".format(
 					_MEDIA = _MEDIA,
 					_CODE = _CODE,
+					_KEY = _KEY,
 					sdate = params['sdate'],
 					edate = params['edate']
 				)
@@ -121,6 +130,7 @@ class KpfDb:
 			result = {"success": True}
 
 			totalInfo = self.total(params)
+			print("totalInfo : ", totalInfo)
 			result = totalInfo
 			if not totalInfo['success']: return
 
