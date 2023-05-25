@@ -44,9 +44,11 @@ def log():
             else:
                 isValidkey = kpfUser.find_key(key)
                 if isValidkey["success"]:
-                    return render_template('log.html', accessType = "key")
+                    return render_template(
+                        'log.html', accessType="key", key=key)
                 else:
-                    return render_template('login.html', accessType = "key")
+                    return render_template(
+                        'login.html', accessType="key")
         else:
             return render_template('log.html', accessType = "token")
     elif request.method == 'POST':

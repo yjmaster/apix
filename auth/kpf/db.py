@@ -149,6 +149,13 @@ class KpfDb:
 					display = display
 				)
 
+			_KEY = ""
+			key = params['key']
+			if key and key != "881143FD-49DC-4F0B-9946-2E831A359C80":
+				_KEY = "AND id_client = '{id_client}'".format(
+					id_client = key
+				)
+
 			_SQL = """SELECT *
 				FROM news_ai_log
 				WHERE 1=1
@@ -156,12 +163,14 @@ class KpfDb:
 				AND request_date <= '{edate} 23:59:59'
 				{_MEDIA}
 				{_CODE}
+				{_KEY}
 				ORDER BY request_date DESC
 				{_LIMIT}""".format(
 					sdate = params['sdate'],
 					edate = params['edate'],
 					_MEDIA = _MEDIA,
 					_CODE = _CODE,
+					_KEY = _KEY,
 					_LIMIT = _LIMIT
 				)
 

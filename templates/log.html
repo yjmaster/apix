@@ -33,13 +33,15 @@
     <script src="{{ url_for('static', filename='js/log.js') }}"></script>
 	<script>
 		$(document).ready(function(){
-			let accessType =  "{{accessType}}"
+			let key = "";
+			let accessType = "{{accessType}}";
 			if(accessType === "key"){
 				$("#btn_area").hide();
+				key = "{{key}}";
 			}else if(accessType === "token"){
 				$("#btn_area").show();
 			}
-			log.init();
+			log.init(key);
 		});
 	</script>
 </head>

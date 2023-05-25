@@ -6,14 +6,16 @@ let log = {
         display: 10,
         media: '',
         code: '',
+        key: '',
         excel: false
     },
-    init: function(){
+    init: function(key){
         let browser = $(window).height();
         let wraper = $("#wraper").height();
         let top = (browser - wraper) / 2;
         $("#wraper").css("margin-top", `${top}px`);
-        
+
+        log.params.key = key
         log.setDatePicker();
         log.setDateRange();
         log.getOptions();
