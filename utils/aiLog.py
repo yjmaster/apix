@@ -22,23 +22,110 @@ class aiLog:
 		self.conn.query("set character_set_results=utf8;")
 		self.conn.query("set character_set_database=utf8;")
 
-	def count_log(self, cntInfo):
+	def save_log(self, logInfo, params):
+		try:
+			self.connect_db()
+			res = {"success": True}
+
+			if logInfo["data"]:
+				self.error_data_log(params)
+
+			media_sql = ""
+			if "media" in logInfo:
+				media_sql = "media = '{}',".format(logInfo["media"])
+			else:
+				media_sql = "media = (\
+					SELECT media\
+					FROM news_ai_users\
+					WHERE id_client = '{id_client}'),"
+
+			response_sql = ""
+			code = logInfo['code']
+			if code == 200:
+				res = self.count_log(logInfo)
+				response_sql = "response_date = NOW(),"
+
+			message_sql = ""
+			if not logInfo["success"]:
+				message = self.conn.escape_string(logInfo["message"])
+				message_sql = "error_msg = '{}' ,".format(message)
+
+			eid_sql = ""
+			if "eid" in logInfo:
+				eid_sql = "eid = '{}' ,".format(logInfo["eid"])
+
+			_SQL = """INSERT INTO news_ai_log SET
+					`uid` = UUID(),
+					{media_sql}
+					id_client = '{id_client}',
+					{message_sql}
+					router = '{router}',
+					request_date = NOW(),
+					{response_sql}
+					{eid_sql}
+					response_code = '{code}'""".format(
+						media_sql = media_sql,
+						id_client = logInfo['id_client'],
+						message_sql = message_sql,
+						router = logInfo['router'],
+						response_sql = response_sql,
+						eid_sql = eid_sql,
+						code = logInfo['code']
+					)
+
+
+			# print("호출 로그 ----------> \n", _SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+			# raise Exception('save_log test error')
+		except Exception as exp:
+			res = {"success": False, "code": 500, "message": str(exp)}
+			print("save_log error : {}\n".format(str(exp)))
+			print("save_log query : {}\n".format(_SQL))
+		finally:
+			self.conn.commit()
+			return res
+
+	def count_log(self, logInfo):
 		try:
 			res = {"success": True}
 
-			_SQL = """INSERT INTO news_ai_cnt SET
-					media = '{media}',
-					router = '{router}',
-					id_client = '{id_client}',
-					cnt = 1,
-					last_date = NOW()
-				ON DUPLICATE KEY UPDATE
-					cnt = cnt + 1,
-					last_date = NOW()""".format(
-						media = cntInfo['media'],
-						router = cntInfo['router'],
-						id_client = cntInfo['id_client']
-					)
+			_SQL = ""
+			if logInfo["view"]:
+				_SQL = """INSERT INTO news_ai_cnt SET
+						media = (
+							SELECT media
+							FROM news_ai_users
+							WHERE id_client = '{id_client}'
+						),
+						router = '{router}',
+						id_client = '{id_client}',
+						view_cnt = 1,
+						last_date = NOW()
+					ON DUPLICATE KEY UPDATE
+						view_cnt = view_cnt + 1,
+						last_date = NOW()""".format(
+							router = logInfo['router'],
+							id_client = logInfo['id_client']
+						)
+			else:
+				_SQL = """INSERT INTO news_ai_cnt SET
+						media = (
+							SELECT media
+							FROM news_ai_users
+							WHERE id_client = '{id_client}'
+						),
+						router = '{router}',
+						id_client = '{id_client}',
+						api_cnt = 1,
+						last_date = NOW()
+					ON DUPLICATE KEY UPDATE
+						api_cnt = api_cnt + 1,
+						last_date = NOW()""".format(
+							router = logInfo['router'],
+							id_client = logInfo['id_client']
+						)
 
 			# print("카운팅 로그 ----------> \n", _SQL)
 
@@ -48,7 +135,41 @@ class aiLog:
 		except Exception as exp:
 			res = {"success": False, "code": 500, "message": str(exp)}
 			print("count_log error : {}\n".format(str(exp)))
-			print("query : {}\n".format(_SQL))	
+			print("count_log query : {}\n".format(_SQL))	
+		finally:
+			self.conn.commit()
+			return res
+
+	def error_data_log(self, params):
+		try:
+			res = {"success": True}
+
+			summary_sql = ""
+			if "summary" in params:
+				summary = self.conn.escape_string(params['summary'])
+				summary_sql = "summary = '{}' ,".format(summary)
+
+			_SQL = """INSERT INTO error_data
+				SET eid = '{eid}',
+					title = '{title}',
+					content = '{content}',
+					{summary_sql}
+					request_date = NOW()""".format(
+						eid = params['eid'],
+						title = params['title'],
+						content = params['content'],
+						summary_sql = summary_sql
+					)
+
+			# print("데이터 로그 ----------> \n", _SQL)
+
+			curs = self.conn.cursor()
+			curs.execute(_SQL)
+
+		except Exception as exp:
+			res = {"success": False, "message": str(exp)}
+			print("error_data_log error : {}\n".format(str(exp)))
+			print("error_data_log query : {}\n".format(_SQL))
 		finally:
 			self.conn.commit()
 			return res
@@ -130,7 +251,7 @@ class aiLog:
 
 			if not resInfo['success'] and code != 500 and code != 401 and code != 403:
 				params.update({'uid': uid})
-				self.error_data_log(params)
+				self.error_data_log_(params)
     
 			if resInfo['success'] and code == 200:
 				res = self.count_log(resInfo)
@@ -145,7 +266,7 @@ class aiLog:
 			self.conn.close()
 			return res
 
-	def error_data_log(self, params):
+	def error_data_log_(self, params):
 		try:
 			res = {"success": True}
 

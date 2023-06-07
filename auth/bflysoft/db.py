@@ -43,7 +43,7 @@ class BflysoftDb:
 			isUser = curs.fetchone()
 			if not isUser :
 				res['message'] = '존재하지 않는 사용자 입니다.'
-				res['code'] = 401
+				res['code'] = 400
 				return
 
 			NM_CLIENT = isUser[0]

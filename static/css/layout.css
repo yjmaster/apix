@@ -14,8 +14,7 @@ a { color:#030303 }
 #wrapper .form-control:active, .form-control:focus { border: none; box-shadow: none; } 
 #wrapper .btn { padding:.375rem .5rem; font-weight:normal; border-radius: 5px; border:0; cursor: pointer !important } 
 #wrapper .btn:active, .btn:focus { border: none; box-shadow: none; } 
-button, input, select { font-family: inherit; font-size: inherit; line-height: inherit; text-transform: none; margin:0; cursor: pointer !important}
-textarea { font-family: inherit; font-size: inherit; line-height: inherit; text-transform: none; margin:0;}
+button, input, select, textarea { font-family: inherit; font-size: inherit; line-height: inherit; text-transform: none; margin:0; cursor: pointer !important}
 .form-control {border-radius: 5px }
 
 
@@ -23,8 +22,9 @@ textarea { font-family: inherit; font-size: inherit; line-height: inherit; text-
 
 #wrapper {width:100%; height:100%; margin-top:50px; overflow-y: auto; position: relative}
 
-.edit_wrap {margin:20px auto; width:768px; height:100%; position: relative}
-.edit_wrap h2 {font-size: 1rem; font-weight: bold; margin-bottom:15px}
+.edit_wrap {margin:0 auto; min-width:1200px; padding:12px; max-width: 90%; height:100%; position: relative}
+.edit_wrap h2 {	font-size: 1rem; font-weight: bold; margin-bottom:15px; background: #7451c0; color:#fff;
+	padding:20px }
 
 .tit_wrap {border:1px solid #dcdcdc; border-bottom:0}
 .tit_wrap h1 {text-align: center; padding:15px; font-size:14px; line-height:1 !important; font-weight:500; margin-bottom:0; }
@@ -52,28 +52,32 @@ textarea { font-family: inherit; font-size: inherit; line-height: inherit; text-
 .top_option > div {margin-right: 15px;}
 .top_option span {display: inline-block; width:auto; line-height:30px; padding-right:10px; font-weight: 500}
 .top_option span::before{ content: "·";  margin-right: 5px;}
-.top_option .form-control {width:100px; height:30px; border-radius: 5px }
+.top_option .form-control {width:100px; height:30px; border-radius: 0 }
 .top_option em {padding:4px 5px}
-.top_option .btn_top {position: absolute; padding-right:25px; right:15px; font-weight:500;  		
-	color:#fff;	border:none; border-radius: 5px; height:30px; 
-	background:#1565C0 url(../img/srch_ico.png) no-repeat calc(100% - 8px) center; 
+.top_option .btn_top {position: absolute; padding-left:25px; right:15px; font-weight:500;  		
+	color:#fff;	border:none; height:30px;  border-radius: 0; width:72px;
+	background:#667ee5 url(../img/srch_ico.png) no-repeat 10px center; 
 	background-size:11px}
+.top_option .btn_top:hover {background:#3d53b4 url(../img/srch_ico.png) no-repeat 10px center; background-size:11px}
 
 .date_input {background: url(../img/date_ico.png) no-repeat center left calc(100% - 7px);}
 
 .log_table {margin-top:10px; widtH:100%; border:1px solid #dcdcdc;}
-.log_table .Htable01 {background:#ebebeb;  }
+.log_table .Htable01 {background:#e9ecef; border-top: 2px solid #e9ecef; border-bottom:none }
 .log_table .Htable01 th {padding:2px; font-weight: 500}
-.log_table .index_body tr td {padding:5px 0 5px 10px; white-space: normal; word-break: break-all;text-align: left}
+.log_table .index_body tr td {padding:5px 0 5px 10px; white-space: normal; word-break: break-all; text-align: center}
 .log_table .index_body tr td:nth-child(2) {text-align: center; padding:0}
 .log_table .index_body tr td:nth-child(4) {text-align: center; padding:0}
-.Btable03 {height:340px !important }
+.edit_wrap .Btable03 {min-height:520px !important; max-height: 100%; }
 
-.btn_down {background: #0288D1 !important; color:#fff !important; }
-.btn_down:hover {background: #0d78b3 !important; font-weight: 400 !important }
+.edit_wrap .btn_down {padding: 0 10px;border: 1px solid #a088d5; color: #7451c0; line-height: 21px;
+    background: #f1edf9; border-radius: 0}
+.btn_down:hover {background: #fff !important; font-weight: 400 !important }
 .flex_wrap {display: flex; justify-content: space-between; align-items: center}
-.pagenation a:hover:not(.active) {background:#ebebeb !important; }
+.pagenation a:hover {background:#ebebeb !important; }
 .flex_wrap .form-control {width:50px}
+
+.index_body tr td:first-child {padding-left: 0 !important}
 
 
 

@@ -36,7 +36,7 @@ class KpfUser:
 	def find_key(self, key):
 		try:
 			kpfDb.connect_db()
-			result = {"success": True}
+			res = {"success": True}
 
 			_SQL = """SELECT *
 				FROM news_ai_users
@@ -45,22 +45,26 @@ class KpfUser:
 					key = key
 				)
 
+			# print(_SQL)
+
 			curs = kpfDb.conn.cursor()
 			curs.execute(_SQL)
+
 			user = curs.fetchone()
 			if user:
-				result["id_client"] = user[0]
-				result["media"] = user[1]
+				res["id_client"] = user[0]
+				res["media"] = user[1]
 			else:
-				result["success"] = False
-				result["message"] = "존재하지 않는 사용자 입니다."
+				res["success"] = False
+				res["message"] = "존재하지 않는 사용자 입니다."
+				res['code'] = 400
 
 		except Exception as exp :
-			result = {"success": False, "message": str(exp)}
+			res = {"success": False, "code": 500, "message": str(exp)}
 		finally: 
 			kpfDb.conn.cursor().close()
 			kpfDb.conn.close()
-			return result
+			return res
 
 
 

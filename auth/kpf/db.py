@@ -26,21 +26,13 @@ class KpfDb:
 		try:
 			result = {"success": True}
 
-			_MEDIA = ""
-			media = params['media']
-			if media != '':
-				if media == '(NULL)':
-					_MEDIA = "AND media IS NULL"
-				else:
-					_MEDIA = "AND media = '{}'".format(params['media'])
-
 			_CODE = ""
 			code = params['code']
 			if code != '':
 				_CODE = "AND response_code = '{}'".format(params['code'])
 
 			_KEY = ""
-			key = params['key']
+			key = params['id_client']
 			if key and key != "881143FD-49DC-4F0B-9946-2E831A359C80":
 				_KEY = "AND id_client = '{id_client}'".format(
 					id_client = key
@@ -49,12 +41,10 @@ class KpfDb:
 			_SQL = """SELECT count(*)
 				FROM news_ai_log
 				WHERE 1=1
-				{_MEDIA}
 				{_CODE}
 				{_KEY}
 				AND request_date >= '{sdate} 00:00:00'
 				AND request_date <= '{edate} 23:59:59'""".format(
-					_MEDIA = _MEDIA,
 					_CODE = _CODE,
 					_KEY = _KEY,
 					sdate = params['sdate'],
@@ -84,14 +74,21 @@ class KpfDb:
 		try:
 			self.connect_db()
 			result = {"success": True}
-    
+
+			id_client_sql = ""
+			id_client = params['id_client']
+			if id_client != "881143FD-49DC-4F0B-9946-2E831A359C80":
+				id_client_sql = "AND id_client = '{}'".format(id_client)
+
 			_SQL = """SELECT
 				DISTINCT media, response_code
 				FROM news_ai_log
 				WHERE 1=1
+				{id_client_sql}
 				AND request_date >= '{sdate} 00:00:00'
 				AND request_date <= '{edate} 23:59:59'
 				ORDER BY request_date DESC""".format(
+					id_client_sql = id_client_sql,
 					sdate = params['sdate'],
 					edate = params['edate']
 				)
@@ -130,7 +127,6 @@ class KpfDb:
 			result = {"success": True}
 
 			totalInfo = self.total(params)
-			print("totalInfo : ", totalInfo)
 			result = totalInfo
 			if not totalInfo['success']: return
 
@@ -138,14 +134,6 @@ class KpfDb:
 			page = int(params['page'])
 			start = (page -1) * display
 
-			_MEDIA = ""
-			media = params['media']
-			if media != '':
-				if media == '(NULL)':
-					_MEDIA = "AND media IS NULL"
-				else:
-					_MEDIA = "AND media = '{}'".format(params['media'])
-    
 			_CODE = ""
 			code = params['code']
 			if code != '':
@@ -160,7 +148,7 @@ class KpfDb:
 				)
 
 			_KEY = ""
-			key = params['key']
+			key = params['id_client']
 			if key and key != "881143FD-49DC-4F0B-9946-2E831A359C80":
 				_KEY = "AND id_client = '{id_client}'".format(
 					id_client = key
@@ -171,14 +159,12 @@ class KpfDb:
 				WHERE 1=1
 				AND request_date >= '{sdate} 00:00:00'
 				AND request_date <= '{edate} 23:59:59'
-				{_MEDIA}
 				{_CODE}
 				{_KEY}
 				ORDER BY request_date DESC
 				{_LIMIT}""".format(
 					sdate = params['sdate'],
 					edate = params['edate'],
-					_MEDIA = _MEDIA,
 					_CODE = _CODE,
 					_KEY = _KEY,
 					_LIMIT = _LIMIT
@@ -192,7 +178,10 @@ class KpfDb:
 			logs = []
 			for idx, row in enumerate(curs) :
 				request_date = row[3].strftime("%Y-%m-%d %H:%M:%S")
-				response_date = row[4].strftime("%Y-%m-%d %H:%M:%S")
+				response_date =  row[4]
+				if response_date:
+					response_date = response_date.strftime("%Y-%m-%d %H:%M:%S")
+				else: response_date = ""
 				logs.append({
 					'uid': row[0],
 					'media': row[1],

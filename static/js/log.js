@@ -6,16 +6,18 @@ let log = {
         display: 10,
         media: '',
         code: '',
-        key: '',
+        id_client: '',
         excel: false
     },
-    init: function(key){
+    init: function(id_client){
         let browser = $(window).height();
         let wraper = $("#wraper").height();
         let top = (browser - wraper) / 2;
         $("#wraper").css("margin-top", `${top}px`);
 
-        log.params.key = key
+        log.params.id_client = id_client
+        log.params.media = $.cookie('media');
+
         log.setDatePicker();
         log.setDateRange();
         log.getOptions();
@@ -67,22 +69,44 @@ let log = {
     getOptions: function(type){
         let sendData = JSON.stringify(log.params);
         Utils.call('POST', `/options`, sendData, function(res){
-            let html = `<option value="">전체</option>\n`;
-            let mhtml = html;
-            let chtml = html;
-            let options = res['options'];
-            if(res.success){
-                for (let media of options['media']) {
-                    mhtml += `<option value="${media}">${media}</option>\n`;
+            if(log.params.id_client == "881143FD-49DC-4F0B-9946-2E831A359C80"){
+                let html = `<option value="">전체</option>\n`;
+                let mhtml = html;
+                let chtml = html;
+                let options = res['options'];
+                if(res.success){
+                    for (let media of options['media']) {
+                        mhtml += `<option value="${media}">${media}</option>\n`;
+                    }
+                    for (let code of options['code']) {
+                        chtml += `<option value="${code}">${code}</option>\n`;
+                    }
+                }else{
+                    alert(res.message);
                 }
-                for (let code of options['code']) {
-                    chtml += `<option value="${code}">${code}</option>\n`;
-                }
+                $("#media").html(mhtml);
+                $("#code").html(chtml);
             }else{
-                alert(res.message);
+                let html = "";
+                let mhtml = html;
+                let chtml = html;
+                let options = res['options'];
+                if(res.success){
+                    for (let media of options['media']) {
+                        if(media !== "(NULL)"){
+                            $('#media').attr('disabled', true);
+                            mhtml += `<option value="${media}">${media}</option>\n`;
+                        }
+                    }
+                    for (let code of options['code']) {
+                        chtml += `<option value="${code}">${code}</option>\n`;
+                    }
+                }else{
+                    alert(res.message);
+                }
+                $("#media").html(mhtml);
+                $("#code").html(chtml);
             }
-            $("#media").html(mhtml);
-            $("#code").html(chtml);
         }, false);
     },
     getLog: function(){
@@ -132,7 +156,10 @@ let log = {
         }
 
         let tableData = [{"sheetName": "Sheet1", "data": data}];
-        let options = {fileName: "api_log"};
+
+        let rightNow = new Date();
+        let fileName = rightNow.toISOString().slice(0,10).replace(/-/g,"");
+        let options = {fileName: `${fileName}_log`};
         Jhxlsx.export(tableData, options);
         log.params['excel'] = false;
     },
