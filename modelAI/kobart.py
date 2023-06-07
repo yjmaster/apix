@@ -164,7 +164,7 @@ class koBart_title(Resource):
 			
 			logInfo["extractor"] = titles
 
-			raise Exception('kobart test error')
+			# raise Exception('kobart test error')
 		except Exception as exp:
 			# 에러 데이터 key값
 			eid = round(datetime.utcnow().timestamp() * 1000)
@@ -232,26 +232,25 @@ class KobartKeyword(Resource):
 			id_client = args['id_client']
 			title = args['title']
 			content = args['content']
+			view = args['view'] if "view" in args else False
 
 			logInfo = {
 				'code': 200,
+				'success': True,
 				'router': router,
-				'id_client': id_client
+				'id_client': id_client,
+				'data': False,
+				'view': view
 			}
 
-			# 재단 디비에서 사용자 인증을 한다.
-			res = kpfUser.find_key(id_client)
-			logInfo.update(res)
+			if view:
+				# 재단 디비에서 사용자 인증을 한다.
+				res = kpfUser.find_key(id_client)
+			else:
+				# 비플라이 디비에서 사용자 인증을 받는다.
+				res = bflysoftDb.authentication(id_client)
 
-			# 호출 로그를 남겨준다.
-			res = log.request_log(logInfo)
 			logInfo.update(res)
-			if not logInfo['success']: return
-
-			# 키 인증을 받는다.
-			res = bflysoftDb.authentication(id_client)
-			logInfo.update(res)
-			if not res['success']: return
 
 			# 데이터 유효성 체크
 			top3Summary = ""
@@ -263,7 +262,6 @@ class KobartKeyword(Resource):
 					"message": "5문장 이상 입력해주세요.",
 					'code': 400
 				})
-				res = logInfo
 				return
 			elif len(sents) > 33:
 				content = ""
@@ -290,7 +288,6 @@ class KobartKeyword(Resource):
 			# keyword1 = {"success": True, "extractor": "키워드1/키워드2/키워드3"}
 			if not keyword1['success']:
 				logInfo.update(keyword1)
-				res = logInfo
 				return
 
 			keyword2 = kobart_api.kobart_keyword(top3Summary)
@@ -299,7 +296,6 @@ class KobartKeyword(Resource):
 			if not keyword2['success']:
 				args['summary'] = top3Summary
 				logInfo.update(keyword2)
-				res = logInfo
 				return
 
 			k1 = keyword1["extractor"].split("/")
@@ -310,31 +306,44 @@ class KobartKeyword(Resource):
 			keywords = textFormat.keywordsIncludeContent(total_contents, keywords)
 
 			logInfo["extractor"] = keywords
-			res = logInfo
 
 			# raise Exception('kobart keyword test error')
 		except Exception as exp:
+			# 에러 데이터 key값
+			eid = round(datetime.utcnow().timestamp() * 1000)
+			logInfo["eid"] = eid
+			args["eid"] = eid
+			logInfo["data"] = True
+
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
-			sendJson = {}
-			# 완료 로그를 남겨준다.
-			complete_res = log.response_log(logInfo, args)
-			if not complete_res['success']:
-				res = complete_res
-				logInfo.update(complete_res)
-				log.response_log(logInfo, args)
+			sendJson = {"success": True}
+			logSave = log.save_log(logInfo, args)
 
-			if res['code'] != 200:
-				sendJson = res
+			# 로그정보가 저장된 경우
+			if logSave["success"]:
+
+				# 로그정보가 성공인 경우
+				if logInfo["success"]:
+					sendJson["success"] = logInfo["success"]
+					sendJson["extractor"] = logInfo["extractor"]
+
+				# 로그정보가 실패인 경우
+				else:
+					sendJson["success"] = logInfo["success"]
+					sendJson["message"] = logInfo["message"]
+
+			# 로그정보가 저장실패인 경우
 			else:
-				sendJson["success"] = res["success"]
-				sendJson["extractor"] = res["extractor"]
+				sendJson["success"] = logSave["success"]
+				sendJson["message"] = logSave["message"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
 			print("finally: ", sendJson)
 			print("------------------------------------")
+
 			return make_response(sendJson, logInfo['code'])
 
 @Kobart.route('/subTitle')
@@ -366,21 +375,25 @@ class KobartKeyword(Resource):
 			id_client = args['id_client']
 			title = args['title']
 			content = args['content']
+			view = args['view'] if "view" in args else False
 
 			logInfo = {
 				'code': 200,
+				'success': True,
 				'router': router,
-				'id_client': id_client
+				'id_client': id_client,
+				'data': False,
+				'view': view
 			}
 
-			# 재단 디비에서 사용자 인증을 한다.
-			res = kpfUser.find_key(id_client)
-			logInfo.update(res)
+			if view:
+				# 재단 디비에서 사용자 인증을 한다.
+				res = kpfUser.find_key(id_client)
+			else:
+				# 비플라이 디비에서 사용자 인증을 받는다.
+				res = bflysoftDb.authentication(id_client)
 
-			# 호출 로그를 남겨준다.
-			res = log.request_log(logInfo)
 			logInfo.update(res)
-			if not logInfo['success']: return
 
 			# 데이터 유효성 체크
 			sents = textFormat.contentAnalysis(content)
@@ -391,7 +404,6 @@ class KobartKeyword(Resource):
 					"message": "5문장 이상 입력해주세요.",
 					'code': 400
 				})
-				res = logInfo
 				return
 
 			# 부제목 추출
@@ -406,37 +418,49 @@ class KobartKeyword(Resource):
 				if not title['success']:
 					args['summary'] = summ
 					logInfo.update(title)
-					res = logInfo
 					return
 				subTitles.append(title['extractor'])
 
 			subTitles = list(set(subTitles))
 			logInfo['extractor'] = subTitles
-			res = logInfo
 
 			# raise Exception('kobart subtitle test error')
 		except Exception as exp:
+			# 에러 데이터 key값
+			eid = round(datetime.utcnow().timestamp() * 1000)
+			logInfo["eid"] = eid
+			args["eid"] = eid
+			logInfo["data"] = True
+
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
-			sendJson = {}
-			# 완료 로그를 남겨준다.
-			complete_res = log.response_log(logInfo, args)
-			if not complete_res['success']:
-				res = complete_res
-				logInfo.update(complete_res)
-				log.response_log(logInfo, args)
+			sendJson = {"success": True}
+			logSave = log.save_log(logInfo, args)
 
-			if res['code'] != 200:
-				sendJson = res
+			# 로그정보가 저장된 경우
+			if logSave["success"]:
+
+				# 로그정보가 성공인 경우
+				if logInfo["success"]:
+					sendJson["success"] = logInfo["success"]
+					sendJson["extractor"] = logInfo["extractor"]
+
+				# 로그정보가 실패인 경우
+				else:
+					sendJson["success"] = logInfo["success"]
+					sendJson["message"] = logInfo["message"]
+
+			# 로그정보가 저장실패인 경우
 			else:
-				sendJson["success"] = res["success"]
-				sendJson["extractor"] = res["extractor"]
+				sendJson["success"] = logSave["success"]
+				sendJson["message"] = logSave["message"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
 			print("finally: ", sendJson)
 			print("------------------------------------")
+
 			return make_response(sendJson, logInfo['code'])
 
 @Kobart.route('/oneLine')
@@ -470,21 +494,25 @@ class koBart_title(Resource):
 			id_client = args['id_client']
 			media = args['media']
 			content = args['content']
+			view = args['view'] if "view" in args else False
 
 			logInfo = {
 				'code': 200,
+				'success': True,
 				'router': router,
-				'id_client': id_client
+				'id_client': id_client,
+				'data': False,
+				'view': view
 			}
 
-			# 재단 디비에서 사용자 인증을 한다.
-			res = kpfUser.find_key(id_client)
-			logInfo.update(res)
+			if view:
+				# 재단 디비에서 사용자 인증을 한다.
+				res = kpfUser.find_key(id_client)
+			else:
+				# 비플라이 디비에서 사용자 인증을 받는다.
+				res = bflysoftDb.authentication(id_client)
 
-			# 호출 로그를 남겨준다.
-			res = log.request_log(logInfo)
 			logInfo.update(res)
-			if not logInfo['success']: return
 
 			# 데이터 유효성 체크
 			sents = textFormat.contentAnalysis(content)
@@ -494,7 +522,6 @@ class koBart_title(Resource):
 					"message": "5문장 이상 입력해주세요.",
 					'code': 400
 				})
-				res = logInfo
 				return
 			elif len(sents) > 33:
 				content = ""
@@ -506,36 +533,50 @@ class koBart_title(Resource):
 			oneLine = kobart_api.kobart_summary_short(content)
 			if not oneLine['success']:
 				logInfo.update(oneLine)
-				res = logInfo
 				return
 			
 			oneLineTxt = oneLine["extractor"]
 			logInfo["extractor"] = oneLineTxt
-			res = logInfo
+
 			# raise Exception('kobart oneLine test error')
 		except Exception as exp:
+			# 에러 데이터 key값
+			eid = round(datetime.utcnow().timestamp() * 1000)
+			logInfo["eid"] = eid
+			args["eid"] = eid
+			logInfo["data"] = True
+
 			res = {"success": False, "code": 400, "message": str(exp)}
 			logInfo.update(res)
 		finally:
-			sendJson = {}
-			# 완료 로그를 남겨준다.
-			complete_res = log.response_log(logInfo, args)
-			if not complete_res['success']:
-				res = complete_res
-				logInfo.update(complete_res)
-				log.response_log(logInfo, args)
+			sendJson = {"success": True}
+			logSave = log.save_log(logInfo, args)
 
-			if res['code'] != 200:
-				sendJson = res
+			# 로그정보가 저장된 경우
+			if logSave["success"]:
+
+				# 로그정보가 성공인 경우
+				if logInfo["success"]:
+					sendJson["success"] = logInfo["success"]
+					sendJson["extractor"] = logInfo["extractor"]
+
+				# 로그정보가 실패인 경우
+				else:
+					sendJson["success"] = logInfo["success"]
+					sendJson["message"] = logInfo["message"]
+
+			# 로그정보가 저장실패인 경우
 			else:
-				sendJson["success"] = res["success"]
-				sendJson["extractor"] = res["extractor"]
+				sendJson["success"] = logSave["success"]
+				sendJson["message"] = logSave["message"]
 
 			print("------------------------------------")
 			print("logInfo : ", logInfo)
 			print("finally: ", sendJson)
 			print("------------------------------------")
+
 			return make_response(sendJson, logInfo['code'])
+
 
 ''' @Kobart.route('/topic')
 class koBart_title(Resource):
