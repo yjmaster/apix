@@ -43,20 +43,19 @@ def log():
         # http://localhost:10001/log?key=6CF283C1-4708-5BDD-F4D0-B02C8DF03D7E
         key = request.args.get('key', type=str)
         token = request.cookies.get('access_token')
-        if token is None :
-            if key is None:
-                return render_template('login.html')
+        if key:
+            isKpfUser = kpfUser.find_key(key)
+            isBflyUser = bflysoftDb.authentication(key)
+            if isKpfUser["success"] or isBflyUser["success"]:
+                return render_template(
+                    'log.html', accessType="key", key=key)
             else:
-                isKpfUser = kpfUser.find_key(key)
-                isBflyUser = bflysoftDb.authentication(key)
-                if isKpfUser["success"] or isBflyUser["success"]:
-                    return render_template(
-                        'log.html', accessType="key", key=key)
-                else:
-                    return render_template(
-                        'login.html', accessType="key")
+                return render_template('login.html')
         else:
-            return render_template('log.html', accessType = "token")
+            if token:
+                return render_template('log.html', accessType = "token")
+            else:
+                return render_template('login.html')
     elif request.method == 'POST':
         data = request.get_json()
         return kpfDb.get_log(data)

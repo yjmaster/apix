@@ -38,6 +38,9 @@
 			if(accessType === "key"){
 				$("#btn_area").hide();
 				id_client = "{{key}}";
+				if($.cookie('access_token')){
+					$.removeCookie('access_token');
+				}
 			}else if(accessType === "token"){
 				$("#btn_area").show();
 				id_client = $.cookie('access_token');
