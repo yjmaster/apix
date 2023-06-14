@@ -10,6 +10,12 @@ let Utils = {
 			data: data,
 			async: async,
 			beforeSend: function(xhr){
+				/*
+				let client_id = data.client_id;
+				if(client_id){
+					xhr.setRequestHeader("Authorization", client_id);
+				}
+				*/
 				$.LoadingOverlay("show", {
 					background: "rgba(0, 0, 0, 0.5)",
 					spinnerIcon: 'ball-circus',

@@ -169,13 +169,13 @@ let log = {
         if(res.success){
             for (let [idx, row] of res['list'].entries()) {
                 let request_date = row['request_date'];
-                request_date = request_date.replaceAll(' ', '<br/>');
+                //request_date = request_date.replaceAll(' ', '<br/>');
                 
                 let message = (ObjectUtils.isNotEmpty(
                     row['error_msg'])? row['error_msg'] : "");
 
                 let response_date = row['response_date'];
-                response_date = response_date.replaceAll(' ', '<br/>');
+                //response_date = response_date.replaceAll(' ', '<br/>');
 
                 html += `<tr>\n`;
                 html += `   <td>${row['uid']}</td>\n`;

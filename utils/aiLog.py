@@ -111,11 +111,7 @@ class aiLog:
 						)
 			else:
 				_SQL = """INSERT INTO news_ai_cnt SET
-						media = (
-							SELECT media
-							FROM news_ai_users
-							WHERE id_client = '{id_client}'
-						),
+						media = '{media}',
 						router = '{router}',
 						id_client = '{id_client}',
 						api_cnt = 1,
@@ -123,6 +119,7 @@ class aiLog:
 					ON DUPLICATE KEY UPDATE
 						api_cnt = api_cnt + 1,
 						last_date = NOW()""".format(
+							media = logInfo['media'],
 							router = logInfo['router'],
 							id_client = logInfo['id_client']
 						)

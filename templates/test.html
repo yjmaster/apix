@@ -2,35 +2,45 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Kobart 테스트</title>
+    <title>테스트</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js" integrity="sha512-szJ5FSo9hEmXXe7b5AUVtn/WnL8a5VofnFeYC2i2z03uS2LhAch7ewNLbl5flsEmTTimMN0enBZg/3sQ+YOSzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        //https://gist.github.com/GaspardP/fffdd54f563f67be8944
+        var secret_key = "test"
+
+
+      //1  b'test'
+      //2  <sha256 _hashlib.HASH object @ 0x0000021EB815F6D0>
+      //3  b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08'
+        // b'test'
+        //secret_key :  b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08'
+        /*
+        $("#log").click(function() {
+          window.open('http://localhost:10001/log?key=6CF283C1-4708-5BDD-F4D0-B02C8DF03D7E', 'window_name', 'width=1250, height=850, location=no, status=no, scrollbars=yes');
+        });
+        */
+        $("#log").click(function(){
+          let client_id = "6CF283C1-4708-5BDD-F4D0-B02C8DF03D7E";
+          Utils.call('POST', `/test`, { client_id }, function(res){
+            if(res.success){
+              window.open(`http://localhost:10001/log?key=${res.encrypt_key}`, 'window_name', 'width=1300, height=900, location=no, status=no, scrollbars=yes');
+            }else{
+              //console.log("no")
+              //location.href = "http://localhost:10001/login"
+            }
+          })
+        })
+      })
+    </script>
   </head>
 
   <body>
-    <div id="textToSynth">
-      <textarea style="width:1000px;height:400px;font-size:20px;text-align:center; display:block; margin: 0 auto;" type="text" id="textEntry"></textarea>
-      <button class="btn default" onClick="test()">제목 생성</button>
-      <button class="btn default" onClick="clean()">지우기</button>
-      <p id="title">제목 : </p>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script type="text/javascript">
-        function test() {
-            var obj = document.getElementById("textEntry").value;
-            document.getElementById("title").innerHTML = "제목 : 생성중입니다 기다려주세요"
-            $.ajax({
-                type: "get",
-                url: "/kobart?text=" + obj,
-                dataType: "text",
-                success: function(response){
-                    var returnedData = JSON.parse(response);
-                    document.getElementById("title").innerHTML = "제목 : " + returnedData['extractor'] 
-                }
-            })
-        }
+    <button id="log">로그보기</button>
 
-        function clean() {
-            document.getElementById("textEntry").value = "";
-        }
-    </script>
   </body>
 </html>
