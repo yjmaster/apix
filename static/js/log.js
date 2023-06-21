@@ -3,7 +3,7 @@ let log = {
         sdate: '',
         edate: '',
         page: 1,
-        display: 10,
+        display: 20,
         media: '',
         code: '',
         id_client: '',
@@ -79,7 +79,8 @@ let log = {
                         mhtml += `<option value="${media}">${media}</option>\n`;
                     }
                     for (let code of options['code']) {
-                        chtml += `<option value="${code}">${code}</option>\n`;
+                        let codaName = (code == 200 ? "성공" : "실패");
+                        chtml += `<option value="${code}">${codaName}</option>\n`;
                     }
                 }else{
                     alert(res.message);
@@ -99,7 +100,8 @@ let log = {
                         }
                     }
                     for (let code of options['code']) {
-                        chtml += `<option value="${code}">${code}</option>\n`;
+                        let codaName = (code == 200 ? "성공" : "실패");
+                        chtml += `<option value="${code}">${codaName}</option>\n`;
                     }
                 }else{
                     alert(res.message);
@@ -125,7 +127,7 @@ let log = {
         let header = [], data = [];
         let hlist = [
             '로그일렬번호', '언론사',
-            '요청일시',     '반환결과코드',
+            '요청일시',     '반환결과',
             '오류메시지',   '반환일시'
         ];
         for(let i=0; i<hlist.length; i++){
@@ -136,11 +138,12 @@ let log = {
 
         let picked_list = [];
         for (let [idx, row] of res['list'].entries()) {
+            let codaName = (row.response_code == 200 ? "성공" : "실패");
             let execelObj = {
                 uid : row.uid,
                 media : escapeEmpty(row.media),
                 request_date : escapeEmpty(row.request_date),
-                response_code : row.response_code,
+                response_code : codaName,
                 error_msg : escapeEmpty(row.error_msg),
                 response_date : escapeEmpty(row.response_date)
             }
@@ -176,17 +179,18 @@ let log = {
 
                 let response_date = row['response_date'];
                 //response_date = response_date.replaceAll(' ', '<br/>');
-
+                let codaName = (row['response_code'] == 200 ? "성공" : "실패");
                 html += `<tr>\n`;
                 html += `   <td>${row['uid']}</td>\n`;
                 html += `   <td>${row['media']}</td>\n`;
                 html += `   <td class="date">${request_date}</td>\n`;
-                html += `   <td>${row['response_code']}</td>\n`;
+                html += `   <td>${codaName}</td>\n`;
                 html += `   <td>${message}</td>\n`;
                 html += `   <td class="date">${response_date}</td>\n`;
                 html += `</tr>\n`;
             }
-            $("#totalCnt").text(res.cnt);
+            let totalCnt = res.cnt.toLocaleString();
+            $("#totalCnt").text(totalCnt);
 
             let lastPage = res.last_page;
             let currentPage = log.params["page"];

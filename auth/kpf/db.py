@@ -138,7 +138,7 @@ class KpfDb:
 			code = params['code']
 			if code != '':
 				_CODE = "AND response_code = '{}'".format(params['code'])
-    
+
 			_LIMIT = ""
 			excel = params['excel']
 			if not excel :
@@ -154,6 +154,10 @@ class KpfDb:
 					id_client = key
 				)
 
+			_MEDIA = ""
+			if 'media' in params:
+				_MEDIA = "AND media = '{}'".format(params['media'])
+
 			_SQL = """SELECT *
 				FROM news_ai_log
 				WHERE 1=1
@@ -161,12 +165,14 @@ class KpfDb:
 				AND request_date <= '{edate} 23:59:59'
 				{_CODE}
 				{_KEY}
+				{_MEDIA}
 				ORDER BY request_date DESC
 				{_LIMIT}""".format(
 					sdate = params['sdate'],
 					edate = params['edate'],
 					_CODE = _CODE,
 					_KEY = _KEY,
+					_MEDIA = _MEDIA,
 					_LIMIT = _LIMIT
 				)
 
